@@ -143,6 +143,40 @@ public class DCuota {
     }
 
     /**
+     * Listar cuotas por cliente
+     */
+    public List<String[]> findByCliente(int clienteId) {
+        String query = "SELECT c.id, c.estado, c.fecha_pago, c.fecha_vencimiento, c.interes_mora, c.monto_pagado, c.nro_cuota, c.plan_pago, c.venta_id " +
+                "FROM CUOTA c INNER JOIN VENTA v ON c.venta_id = v.id WHERE v.cliente_id = ? ORDER BY c.fecha_vencimiento ASC";
+        List<String[]> cuotas = new ArrayList<>();
+        try {
+            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            ps.setInt(1, clienteId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String[] cuota = new String[9];
+                cuota[0] = String.valueOf(rs.getInt("id"));
+                cuota[1] = rs.getString("estado");
+                cuota[2] = rs.getString("fecha_pago");
+                cuota[3] = rs.getString("fecha_vencimiento");
+                cuota[4] = String.valueOf(rs.getInt("interes_mora"));
+                cuota[5] = String.valueOf(rs.getDouble("monto_pagado"));
+                cuota[6] = String.valueOf(rs.getInt("nro_cuota"));
+                cuota[7] = rs.getString("plan_pago");
+                cuota[8] = String.valueOf(rs.getInt("venta_id"));
+                cuotas.add(cuota);
+            }
+
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return cuotas;
+    }
+
+    /**
      * Buscar cuota por ID
      */
     public String[] findOneById(int id) {

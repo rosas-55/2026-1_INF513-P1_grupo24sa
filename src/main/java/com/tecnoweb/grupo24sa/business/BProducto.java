@@ -20,8 +20,9 @@ public class BProducto {
      * @param estado  estado del producto (activo/inactivo)
      * @param nombre  nombre del producto
      * @param precioVenta precio de venta (> 0)
+     * @param insumoId ID del insumo directo (0 si no aplica)
      */
-    public String registrarProducto(String estado, String nombre, double precioVenta) {
+    public String registrarProducto(String estado, String nombre, double precioVenta, int insumoId) {
         if (nombre == null || nombre.trim().isEmpty()) {
             return "Error: El nombre del producto es obligatorio";
         }
@@ -34,13 +35,14 @@ public class BProducto {
         if (estado == null || estado.trim().isEmpty()) {
             return "Error: El estado es obligatorio";
         }
-        return dProducto.save(estado.trim(), nombre.trim(), precioVenta, 0);
+        Integer insumo = insumoId > 0 ? insumoId : null;
+        return dProducto.save(estado.trim(), nombre.trim(), precioVenta, 0, insumo);
     }
 
     /**
      * Actualiza un producto existente
      */
-    public String actualizarProducto(int id, String estado, String nombre, double precioVenta) {
+    public String actualizarProducto(int id, String estado, String nombre, double precioVenta, int insumoId) {
         String[] prod = dProducto.findOneById(id);
         if (prod == null) {
             return "Error: Producto no encontrado con ID: " + id;
@@ -55,7 +57,8 @@ public class BProducto {
             return "Error: El estado es obligatorio";
         }
         int stockActual = (prod.length > 4 && prod[4] != null) ? Integer.parseInt(prod[4]) : 0;
-        return dProducto.update(id, estado.trim(), nombre.trim(), precioVenta, stockActual);
+        Integer insumo = insumoId > 0 ? insumoId : null;
+        return dProducto.update(id, estado.trim(), nombre.trim(), precioVenta, stockActual, insumo);
     }
 
     /**

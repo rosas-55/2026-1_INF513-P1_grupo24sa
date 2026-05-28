@@ -27,19 +27,19 @@ public class HandleProducto {
         }
     }
 
-    /** registrar(estado, nombre, precio_venta) */
+    /** registrar(estado, nombre, precio_venta, insumo_id) */
     private static String registrar(BProducto b, String params) {
         String[] p = params.split(",");
-        if (p.length < 3) return "Error: Uso: registrar(estado, nombre, precio_venta)";
-        return b.registrarProducto(p[0].trim(), p[1].trim(), Double.parseDouble(p[2].trim()));
+        if (p.length < 4) return "Error: Uso: registrar(estado, nombre, precio_venta, insumo_id)";
+        return b.registrarProducto(p[0].trim(), p[1].trim(), Double.parseDouble(p[2].trim()), Integer.parseInt(p[3].trim()));
     }
 
-    /** actualizar(id, estado, nombre, precio_venta) */
+    /** actualizar(id, estado, nombre, precio_venta, insumo_id) */
     private static String actualizar(BProducto b, String params) {
         String[] p = params.split(",");
-        if (p.length < 4) return "Error: Uso: actualizar(id, estado, nombre, precio_venta)";
+        if (p.length < 5) return "Error: Uso: actualizar(id, estado, nombre, precio_venta, insumo_id)";
         return b.actualizarProducto(Integer.parseInt(p[0].trim()), p[1].trim(),
-                p[2].trim(), Double.parseDouble(p[3].trim()));
+                p[2].trim(), Double.parseDouble(p[3].trim()), Integer.parseInt(p[4].trim()));
     }
 
     /** eliminar(id) */
@@ -57,6 +57,7 @@ public class HandleProducto {
               .append(" | Nombre:").append(p[2])
               .append(" | Precio:").append(p[3])
               .append(" | Stock:").append(p[4])
+              .append(" | Insumo:").append(p[5])
               .append("\n");
         }
         return sb.toString();
@@ -66,6 +67,6 @@ public class HandleProducto {
     private static String buscar(BProducto b, String params) {
         String[] p = b.buscarPorId(Integer.parseInt(params.trim()));
         if (p == null) return "Producto no encontrado";
-        return "ID: " + p[0] + "\nNombre: " + p[2] + "\nEstado: " + p[1] + "\nPrecio: " + p[3] + "\nStock: " + p[4];
+        return "ID: " + p[0] + "\nNombre: " + p[2] + "\nEstado: " + p[1] + "\nPrecio: " + p[3] + "\nStock: " + p[4] + "\nInsumoID: " + p[5];
     }
 }

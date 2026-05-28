@@ -5,6 +5,7 @@ import com.tecnoweb.grupo24sa.data.DVenta;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -21,40 +22,52 @@ public class BCuota {
     }
 
     /**
-     * Registra una nueva cuota para una venta a crédito
-     * @param estado           estado de la cuota (PENDIENTE, PAGADO, EN_MORA)
-     * @param fechaPago        fecha de pago efectivo (puede ser null si no pagado aún)
-     * @param fechaVencimiento fecha límite de pago
-     * @param interesMora      porcentaje de mora (>= 0)
-     * @param montoPagado      monto pagado (>= 0)
-     * @param nroCuota         número de cuota dentro del plan (>= 1)
-     * @param planPago         descripción del plan de pago
-     * @param ventaId          ID de la venta (debe existir)
+     * Lista todas las cuotas de un cliente y muestra la morosidad si corresponde
      */
-    public String registrarCuota(String estado, String fechaPago, String fechaVencimiento,
-                                  int interesMora, double montoPagado, int nroCuota,
-                                  String planPago, int ventaId) {
-        if (dVenta.findOneById(ventaId) == null) {
-            return "Error: La venta con ID " + ventaId + " no existe";
+    public String listarPorCliente(int clienteId) {
+        List<String[]> lista = dCuota.findByCliente(clienteId);
+        if (lista.isEmpty()) {
+            return "No hay cuotas registradas para el cliente " + clienteId;
         }
-        if (nroCuota < 1) {
-            return "Error: El número de cuota debe ser mayor a 0";
+
+        StringBuilder sb = new StringBuilder("=== CUOTAS DEL CLIENTE " + clienteId + " ===\n");
+        LocalDate hoy = LocalDate.now();
+
+        for (String[] c : lista) {
+            int id = Integer.parseInt(c[0]);
+            String estado = c[1];
+            String fechaVencimientoStr = c[3];
+            int interesMora = Integer.parseInt(c[4]);
+            double montoPagado = Double.parseDouble(c[5]); // Este es el monto de la cuota a pagar
+
+            sb.append("N°").append(c[6])
+              .append(" | ID:").append(id)
+              .append(" | Vence: ").append(fechaVencimientoStr)
+              .append(" | Hoy: ").append(hoy.toString());
+
+            if (estado.equalsIgnoreCase("PENDIENTE") || estado.equalsIgnoreCase("EN_MORA")) {
+                try {
+                    LocalDate fechaVenc = LocalDate.parse(fechaVencimientoStr);
+                    if (hoy.isAfter(fechaVenc)) {
+                        long diasAtrasados = ChronoUnit.DAYS.between(fechaVenc, hoy);
+                        double penalizacion = montoPagado * (interesMora / 365.0) * diasAtrasados;
+                        double totalAPagar = montoPagado + penalizacion;
+
+                        sb.append("\n  -> ¡ATRASADO! CuotaMensual = ").append(String.format("%.2f", montoPagado))
+                          .append(" , Interes Moratorio (Penalizacion) = ").append(String.format("%.2f", penalizacion))
+                          .append(" , Total a pagar = ").append(String.format("%.2f", totalAPagar));
+                    } else {
+                         sb.append(" | Estado: ").append(estado).append(" | Monto a pagar: ").append(String.format("%.2f", montoPagado));
+                    }
+                } catch (DateTimeParseException e) {
+                     sb.append(" | Estado: ").append(estado).append(" | Monto a pagar: ").append(String.format("%.2f", montoPagado));
+                }
+            } else {
+                sb.append(" | Estado: ").append(estado).append(" | Monto: ").append(String.format("%.2f", montoPagado));
+            }
+            sb.append("\n");
         }
-        if (montoPagado < 0) {
-            return "Error: El monto pagado no puede ser negativo";
-        }
-        if (interesMora < 0) {
-            return "Error: El interés de mora no puede ser negativo";
-        }
-        if (fechaVencimiento == null || fechaVencimiento.trim().isEmpty()) {
-            return "Error: La fecha de vencimiento es obligatoria";
-        }
-        if (estado == null || estado.trim().isEmpty()) {
-            return "Error: El estado de la cuota es obligatorio";
-        }
-        return dCuota.save(estado.trim(), fechaPago, fechaVencimiento.trim(),
-                interesMora, montoPagado, nroCuota,
-                planPago == null ? "" : planPago.trim(), ventaId);
+        return sb.toString();
     }
 
     /**

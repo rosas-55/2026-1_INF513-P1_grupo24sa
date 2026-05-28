@@ -11,8 +11,6 @@ import java.util.Properties;
 
 public class SendEmail {
 
-    // private final String mail = "ginobaptista@gmail.com";
-    // private final String password = "dqii suby uhmu arbt";
     private final static String PROTOCOL = "smtp";
     private final String mail = "grupo24sa@tecnoweb.org.bo";
     private final String username = "grupo24sa";
@@ -61,7 +59,8 @@ public class SendEmail {
 
                 // Agregar cada archivo adjunto
                 for (File file : attachments) {
-                    System.out.println("[DEBUG] Adjuntando file: " + file.getAbsolutePath() + " exists=" + file.exists());
+                    System.out
+                            .println("[DEBUG] Adjuntando file: " + file.getAbsolutePath() + " exists=" + file.exists());
                     if (file.exists()) {
                         MimeBodyPart attachmentPart = new MimeBodyPart();
                         DataSource source = new FileDataSource(file);

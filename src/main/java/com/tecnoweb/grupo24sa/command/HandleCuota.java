@@ -13,11 +13,11 @@ public class HandleCuota {
         BCuota bCuota = new BCuota();
         try {
             switch (command) {
-                case "registrar":    return registrar(bCuota, params);
                 case "pagar":        return pagar(bCuota, params);
                 case "eliminar":     return eliminar(bCuota, params);
                 case "listarPorVenta": return listarPorVenta(bCuota, params);
                 case "buscar":       return buscar(bCuota, params);
+                case "listarPorCliente": return listarPorCliente(bCuota, params);
                 default:             return "Comando no implementado: " + command;
             }
         } catch (NumberFormatException e) {
@@ -27,19 +27,10 @@ public class HandleCuota {
         }
     }
 
-    /**
-     * registrar(estado, fecha_pago, fecha_vencimiento, interes_mora, monto_pagado,
-     *           nro_cuota, plan_pago, venta_id)
-     * Escribir 'null' en fecha_pago si la cuota aún no ha sido pagada.
-     */
-    private static String registrar(BCuota b, String params) {
-        String[] p = params.split(",");
-        if (p.length < 8) return "Error: Uso: registrar(estado,fecha_pago,fecha_vencimiento,"
-                + "interes_mora,monto_pagado,nro_cuota,plan_pago,venta_id)";
-        String fechaPago = p[1].trim().equalsIgnoreCase("null") ? null : p[1].trim();
-        return b.registrarCuota(p[0].trim(), fechaPago, p[2].trim(),
-                Integer.parseInt(p[3].trim()), Double.parseDouble(p[4].trim()),
-                Integer.parseInt(p[5].trim()), p[6].trim(), Integer.parseInt(p[7].trim()));
+    /** listarPorCliente(cliente_id) */
+    private static String listarPorCliente(BCuota b, String params) {
+        int clienteId = Integer.parseInt(params.trim());
+        return b.listarPorCliente(clienteId);
     }
 
     /** pagar(id, fecha_pago, monto_pagado) */

@@ -34,7 +34,9 @@ CREATE TABLE `Producto` (
     `estado` INT,
     `nombre` VARCHAR(150),
     `precio_venta` DECIMAL(10,2),
-    `stock_actual` INT
+    `stock_actual` INT,
+    `insumo_id` int,
+    FOREIGN KEY (`insumo_id`) REFERENCES `Insumo`(`id`) 
 );
 
 CREATE TABLE `Insumo` (

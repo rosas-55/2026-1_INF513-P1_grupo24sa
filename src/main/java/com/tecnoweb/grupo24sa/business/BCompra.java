@@ -5,6 +5,7 @@ import com.tecnoweb.grupo24sa.data.DProveedor;
 import com.tecnoweb.grupo24sa.data.DInsumo;
 import com.tecnoweb.grupo24sa.data.DDetalleCompra;
 import com.tecnoweb.grupo24sa.data.DInventario;
+import com.tecnoweb.grupo24sa.data.DProducto;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -110,6 +111,15 @@ public class BCompra {
 
                 dInsumo.update(insumoId, nuevoCostoUnitario, insumo[2], insumo[3],
                         insumo[4], nuevoStock, stockMinimo, insumo[7]);
+            }
+
+            // 4. Sincronizar stock con Producto si es un producto directo (por insumo_id)
+            DProducto dProducto = new DProducto();
+            String[] productoDirecto = dProducto.findByInsumoId(insumoId);
+            if (productoDirecto != null) {
+                int prodId = Integer.parseInt(productoDirecto[0]);
+                int stockActualProd = Integer.parseInt(productoDirecto[4]);
+                dProducto.updateStock(prodId, stockActualProd + cantidad);
             }
         }
 

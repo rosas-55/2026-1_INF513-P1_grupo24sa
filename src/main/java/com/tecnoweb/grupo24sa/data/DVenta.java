@@ -45,7 +45,12 @@ public class DVenta {
         String query = "INSERT INTO VENTA (cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id) " +
                 "VALUES (?, ?, ?::date, ?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) {
+                System.err.println("Error: No se pudo obtener la conexion a la base de datos.");
+                return -1;
+            }
+            PreparedStatement ps = conn.prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, clienteId);
             ps.setString(2, estado);
             ps.setString(3, fecha);
@@ -78,7 +83,9 @@ public class DVenta {
     public String updateEstado(int id, String estado) {
         String query = "UPDATE VENTA SET estado = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, estado);
             ps.setInt(2, id);
 
@@ -97,7 +104,9 @@ public class DVenta {
     public String delete(int id) {
         String query = "DELETE FROM VENTA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -116,7 +125,9 @@ public class DVenta {
         String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id FROM VENTA ORDER BY fecha DESC";
         List<String[]> ventas = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return ventas;
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -148,7 +159,9 @@ public class DVenta {
     public String[] findOneById(int id) {
         String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id FROM VENTA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return null;
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -185,7 +198,9 @@ public class DVenta {
         String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id FROM VENTA WHERE cliente_id = ? ORDER BY fecha DESC";
         List<String[]> ventas = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return ventas;
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, clienteId);
             ResultSet rs = ps.executeQuery();
 

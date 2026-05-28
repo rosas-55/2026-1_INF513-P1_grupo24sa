@@ -147,9 +147,11 @@ public class BVenta {
                     // Caso A: Con receta (Plato preparado) -> Omitir descuento en venta
                     // (Los insumos ya fueron descontados previamente al registrar la Producción)
                 } else {
-                    // Caso B: Sin receta (Producto directo, ej: Gaseosa) -> Buscar insumo homónimo
-                    String[] insumo = dInsumo.findOneByName(prod[2]); // prod[2] es el nombre del producto
-                    if (insumo != null) {
+                    // Caso B: Sin receta (Producto directo, ej: Gaseosa) -> Buscar por llave foránea insumo_id
+                    int insumoIdFk = (prod.length > 5 && prod[5] != null) ? Integer.parseInt(prod[5]) : 0;
+                    if (insumoIdFk > 0) {
+                        String[] insumo = dInsumo.findOneById(insumoIdFk);
+                        if (insumo != null) {
                         int insumoId = Integer.parseInt(insumo[0]);
                         double stockActualInsumo = Double.parseDouble(insumo[5]);
                         double costoUnitario = Double.parseDouble(insumo[1]);
@@ -163,6 +165,7 @@ public class BVenta {
                         subtotalInsumo = Math.round(subtotalInsumo * 100.0) / 100.0;
                         dInventario.save(cantidad, fecha.trim(), insumoId,
                                 "Venta ID " + ventaId + " - Producto directo sin receta", "SALIDA", costoUnitario, subtotalInsumo);
+                        }
                     }
                 }
             }

@@ -24,7 +24,7 @@ public class CommandInterpreter {
 
 
         // CU5 - Gestión de Cuotas
-        COMMANDS.put("cuota", new String[] { "registrar", "pagar", "eliminar", "listarPorVenta", "buscar" });
+        COMMANDS.put("cuota", new String[] { "pagar", "eliminar", "listarPorVenta", "buscar", "listarPorCliente" });
 
         // CU6 - Gestión de Insumos
         COMMANDS.put("insumo",
@@ -172,8 +172,9 @@ public class CommandInterpreter {
                 "eliminar(id) | listar() | buscar(id)\r\n" +
                 "\r\n" +
                 "=== PRODUCTO ===\r\n" +
-                "registrar(estado,nombre,precio_venta)\r\n" +
-                "actualizar(id,estado,nombre,precio_venta)\r\n" +
+                "registrar(estado,nombre,precio_venta,insumo_id)\r\n" +
+                "actualizar(id,estado,nombre,precio_venta,insumo_id)\r\n" +
+                "  Usar 0 en insumo_id si es un producto preparado (con receta).\r\n" +
                 "eliminar(id) | listar() | buscar(id)\r\n" +
                 "\r\n" +
                 "=== PROVEEDOR ===\r\n" +
@@ -200,10 +201,9 @@ public class CommandInterpreter {
                 "listar() | buscar(id) | listarPorCliente(cliente_id)\r\n" +
                 "\r\n" +
                 "=== CUOTA ===\r\n" +
-                "registrar(estado,fecha_pago,fecha_vencimiento,interes_mora,monto,nro_cuota,plan_pago,venta_id)\r\n" +
-                "  Usar 'null' en fecha_pago si aún no se ha pagado.\r\n" +
                 "pagar(id,fecha_pago,monto_pagado)   <- detecta mora automaticamente\r\n" +
                 "eliminar(id) | listarPorVenta(venta_id) | buscar(id)\r\n" +
+                "listarPorCliente(cliente_id) <- muestra detalle de mora si existe atraso\r\n" +
                 "\r\n" +
                 "=== INVENTARIO ===\r\n" +
                 "registrar(cantidad,fecha,insumo_id,costo_unitario,observacion,tipo_movimiento)\r\n" +

@@ -26,9 +26,10 @@ public class DatabaseConection {
 
     public Connection openConnection() {
         try {
-            connection = DriverManager.getConnection(url, user, password);
-            System.out.println("Conectado a la BD");
-
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(url, user, password);
+                System.out.println("Conectado a la BD");
+            }
         } catch (SQLException ex) {
             System.err.println("error en la conexion a la base de datos, connection databaseConnection.java: " + ex.getMessage());
             ex.printStackTrace();
