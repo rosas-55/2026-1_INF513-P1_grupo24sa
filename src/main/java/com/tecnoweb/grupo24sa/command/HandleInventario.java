@@ -28,13 +28,13 @@ public class HandleInventario {
         }
     }
 
-    /** registrar(cantidad, fecha, insumo_id, metodo_inventario, observacion, tipo_movimiento) */
+    /** registrar(cantidad, fecha, insumo_id, costo_unitario, observacion, tipo_movimiento) */
     private static String registrar(BInventario b, String params) {
         String[] p = params.split(",");
-        if (p.length < 6) return "Error: Uso: registrar(cantidad,fecha,insumo_id,metodo_inventario,observacion,tipo_movimiento)";
+        if (p.length < 6) return "Error: Uso: registrar(cantidad,fecha,insumo_id,costo_unitario,observacion,tipo_movimiento)";
         return b.registrarMovimiento(
                 Double.parseDouble(p[0].trim()), p[1].trim(),
-                Integer.parseInt(p[2].trim()), p[3].trim(), p[4].trim(), p[5].trim());
+                Integer.parseInt(p[2].trim()), Double.parseDouble(p[3].trim()), p[4].trim(), p[5].trim());
     }
 
     /** actualizar(id, cantidad, observacion) */
@@ -59,7 +59,8 @@ public class HandleInventario {
               .append(" | InsumoID:").append(m[3])
               .append(" | Tipo:").append(m[6])
               .append(" | Cant:").append(m[1])
-              .append(" | Método:").append(m[4])
+              .append(" | Costo:").append(m[4])
+              .append(" | Total:").append(m[7])
               .append(" | Fecha:").append(m[2])
               .append("\n");
         }
@@ -71,7 +72,8 @@ public class HandleInventario {
         String[] m = b.buscarPorId(Integer.parseInt(params.trim()));
         if (m == null) return "Movimiento no encontrado";
         return "ID: " + m[0] + "\nInsumoID: " + m[3] + "\nTipo: " + m[6]
-                + "\nCantidad: " + m[1] + "\nMétodo: " + m[4]
+                + "\nCantidad: " + m[1] + "\nCosto Unitario: " + m[4]
+                + "\nValor Total: " + m[7]
                 + "\nFecha: " + m[2] + "\nObservacion: " + m[5];
     }
 
@@ -85,6 +87,8 @@ public class HandleInventario {
             sb.append("ID:").append(m[0])
               .append(" | Tipo:").append(m[6])
               .append(" | Cant:").append(m[1])
+              .append(" | Costo:").append(m[4])
+              .append(" | Total:").append(m[7])
               .append(" | Fecha:").append(m[2])
               .append("\n");
         }

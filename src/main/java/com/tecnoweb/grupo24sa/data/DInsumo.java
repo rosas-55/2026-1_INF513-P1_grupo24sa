@@ -170,6 +170,41 @@ public class DInsumo {
     }
 
     /**
+     * Buscar insumo por nombre (case-insensitive)
+     */
+    public String[] findOneByName(String nombre) {
+        String query = "SELECT id, costo_unitario, descripcion, estado, nombre, stock_actual, stock_minimo, unidad_medida FROM INSUMO WHERE LOWER(nombre) = LOWER(?)";
+        try {
+            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            ps.setString(1, nombre.trim());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String[] insumo = new String[8];
+                insumo[0] = String.valueOf(rs.getInt("id"));
+                insumo[1] = String.valueOf(rs.getDouble("costo_unitario"));
+                insumo[2] = rs.getString("descripcion");
+                insumo[3] = rs.getString("estado");
+                insumo[4] = rs.getString("nombre");
+                insumo[5] = String.valueOf(rs.getDouble("stock_actual"));
+                insumo[6] = String.valueOf(rs.getDouble("stock_minimo"));
+                insumo[7] = rs.getString("unidad_medida");
+
+                rs.close();
+                ps.close();
+                return insumo;
+            }
+
+            rs.close();
+            ps.close();
+            return null;
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Listar insumos con stock bajo el mínimo
      */
     public List<String[]> findStockBajoMinimo() {
