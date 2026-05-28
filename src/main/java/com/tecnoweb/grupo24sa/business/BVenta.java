@@ -144,28 +144,8 @@ public class BVenta {
                 // 2. Descontar insumos asociados (Inventario Permanente)
                 List<String[]> recetas = dReceta.findByProducto(prodId);
                 if (!recetas.isEmpty()) {
-                    // Caso A: Con receta (Plato preparado) -> Descontar cada ingrediente
-                    int recetaId = Integer.parseInt(recetas.get(0)[0]);
-                    List<String[]> ingredientes = dRecetaInsumo.findByReceta(recetaId);
-                    for (String[] ingrediente : ingredientes) {
-                        double cantidadIngredienteRequerida = Double.parseDouble(ingrediente[0]) * cantidad;
-                        int insumoId = Integer.parseInt(ingrediente[1]);
-                        String[] insumo = dInsumo.findOneById(insumoId);
-                        if (insumo != null) {
-                            double stockActualInsumo = Double.parseDouble(insumo[5]);
-                            double costoUnitario = Double.parseDouble(insumo[1]);
-                            double nuevoStockInsumo = stockActualInsumo - cantidadIngredienteRequerida;
-                            double stockMinimo = Double.parseDouble(insumo[6]);
-
-                            dInsumo.update(insumoId, costoUnitario, insumo[2], insumo[3],
-                                    insumo[4], nuevoStockInsumo, stockMinimo, insumo[7]);
-
-                            double subtotalInsumo = cantidadIngredienteRequerida * costoUnitario;
-                            subtotalInsumo = Math.round(subtotalInsumo * 100.0) / 100.0;
-                            dInventario.save(cantidadIngredienteRequerida, fecha.trim(), insumoId,
-                                    "Venta ID " + ventaId + " - Consumo receta ID " + recetaId, "SALIDA", costoUnitario, subtotalInsumo);
-                        }
-                    }
+                    // Caso A: Con receta (Plato preparado) -> Omitir descuento en venta
+                    // (Los insumos ya fueron descontados previamente al registrar la Producción)
                 } else {
                     // Caso B: Sin receta (Producto directo, ej: Gaseosa) -> Buscar insumo homónimo
                     String[] insumo = dInsumo.findOneByName(prod[2]); // prod[2] es el nombre del producto
