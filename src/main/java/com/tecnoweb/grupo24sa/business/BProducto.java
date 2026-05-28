@@ -34,14 +34,15 @@ public class BProducto {
         if (estado == null || estado.trim().isEmpty()) {
             return "Error: El estado es obligatorio";
         }
-        return dProducto.save(estado.trim(), nombre.trim(), precioVenta);
+        return dProducto.save(estado.trim(), nombre.trim(), precioVenta, 0);
     }
 
     /**
      * Actualiza un producto existente
      */
     public String actualizarProducto(int id, String estado, String nombre, double precioVenta) {
-        if (dProducto.findOneById(id) == null) {
+        String[] prod = dProducto.findOneById(id);
+        if (prod == null) {
             return "Error: Producto no encontrado con ID: " + id;
         }
         if (nombre == null || nombre.trim().isEmpty()) {
@@ -53,7 +54,8 @@ public class BProducto {
         if (estado == null || estado.trim().isEmpty()) {
             return "Error: El estado es obligatorio";
         }
-        return dProducto.update(id, estado.trim(), nombre.trim(), precioVenta);
+        int stockActual = (prod.length > 4 && prod[4] != null) ? Integer.parseInt(prod[4]) : 0;
+        return dProducto.update(id, estado.trim(), nombre.trim(), precioVenta, stockActual);
     }
 
     /**

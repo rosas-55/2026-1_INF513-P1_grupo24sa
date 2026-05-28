@@ -5,6 +5,7 @@ import com.tecnoweb.grupo24sa.data.DReceta;
 import com.tecnoweb.grupo24sa.data.DRecetaInsumo;
 import com.tecnoweb.grupo24sa.data.DInsumo;
 import com.tecnoweb.grupo24sa.data.DInventario;
+import com.tecnoweb.grupo24sa.data.DProducto;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class BProduccion {
     private final DRecetaInsumo dRecetaInsumo;
     private final DInsumo dInsumo;
     private final DInventario dInventario;
+    private final DProducto dProducto;
 
     public BProduccion() {
         this.dProduccion = new DProduccion();
@@ -27,6 +29,7 @@ public class BProduccion {
         this.dRecetaInsumo = new DRecetaInsumo();
         this.dInsumo = new DInsumo();
         this.dInventario = new DInventario();
+        this.dProducto = new DProducto();
     }
 
     /**
@@ -79,6 +82,18 @@ public class BProduccion {
             return resultado;
         }
 
+        // Incrementar el stock del producto terminado en la tabla Producto
+        String[] receta = dReceta.findOneById(recetaId);
+        if (receta != null) {
+            int productoId = Integer.parseInt(receta[2]);
+            String[] prod = dProducto.findOneById(productoId);
+            if (prod != null) {
+                int stockActualProd = (prod.length > 4 && prod[4] != null) ? Integer.parseInt(prod[4]) : 0;
+                int nuevoStockProd = stockActualProd + (int) cantidadProducida;
+                dProducto.updateStock(productoId, nuevoStockProd);
+            }
+        }
+
         // Descontar insumos del inventario (SALIDA)
         for (String[] ingrediente : ingredientes) {
             double cantidadRequerida = Double.parseDouble(ingrediente[0]) * cantidadProducida;
@@ -86,20 +101,23 @@ public class BProduccion {
             String[] insumo = dInsumo.findOneById(insumoId);
             if (insumo == null) continue;
 
+            double costoUnitario = Double.parseDouble(insumo[1]);
+            double subtotal = cantidadRequerida * costoUnitario;
+            subtotal = Math.round(subtotal * 100.0) / 100.0;
+
             // Registrar salida en inventario
             dInventario.save(cantidadRequerida, fecha.trim(), insumoId,
-                    "PRODUCCION", "Consumo por producción receta ID " + recetaId, "SALIDA");
+                    "Consumo por producción receta ID " + recetaId, "SALIDA", costoUnitario, subtotal);
 
-            // Actualizar stock del insumo
+            // Actualizar stock del insumo (el costo promedio no varía en salidas)
             double stockActual = Double.parseDouble(insumo[5]);
             double nuevoStock = stockActual - cantidadRequerida;
-            double costoUnitario = Double.parseDouble(insumo[1]);
             double stockMinimo = Double.parseDouble(insumo[6]);
             dInsumo.update(insumoId, costoUnitario, insumo[2], insumo[3],
                     insumo[4], nuevoStock, stockMinimo, insumo[7]);
         }
 
-        return resultado + " | Insumos descontados correctamente";
+        return resultado + " | Insumos descontados y stock del producto incrementado correctamente";
     }
 
     /**
