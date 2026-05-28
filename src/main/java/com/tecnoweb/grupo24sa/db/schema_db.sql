@@ -141,6 +141,7 @@ CREATE TABLE `Cuota` (
     `nro_cuota` INT,
     `plan_pago` VARCHAR(100),
     `venta_id` INT,
+    `monto_fijo` DECIMAL(10,2),
     FOREIGN KEY (`venta_id`) REFERENCES `Venta`(`id`)
 );
 
