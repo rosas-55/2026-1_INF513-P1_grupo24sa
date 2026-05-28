@@ -92,17 +92,23 @@ public class BCompra {
             dDetalle.save(cantidad, compraId, insumoId, precioUnitario, subtotal);
 
             // 2. Registrar movimiento en inventario (INGRESO)
-            dInventario.save(cantidad, fecha.trim(), insumoId, "COMPRA", "Compra ID " + compraId, "INGRESO");
+            dInventario.save(cantidad, fecha.trim(), insumoId, "Compra ID " + compraId, "INGRESO", precioUnitario, subtotal);
 
-            // 3. Incrementar stock del insumo
+            // 3. Incrementar stock del insumo y recalcular costo promedio ponderado
             String[] insumo = dInsumo.findOneById(insumoId);
             if (insumo != null) {
                 double stockActual = Double.parseDouble(insumo[5]);
-                double nuevoStock = stockActual + cantidad;
-                double costoUnitario = Double.parseDouble(insumo[1]);
+                double costoUnitarioActual = Double.parseDouble(insumo[1]);
                 double stockMinimo = Double.parseDouble(insumo[6]);
 
-                dInsumo.update(insumoId, costoUnitario, insumo[2], insumo[3],
+                double nuevoStock = stockActual + cantidad;
+                double nuevoCostoUnitario = costoUnitarioActual;
+                if (nuevoStock > 0) {
+                    nuevoCostoUnitario = ((stockActual * costoUnitarioActual) + (cantidad * precioUnitario)) / nuevoStock;
+                    nuevoCostoUnitario = Math.round(nuevoCostoUnitario * 100.0) / 100.0;
+                }
+
+                dInsumo.update(insumoId, nuevoCostoUnitario, insumo[2], insumo[3],
                         insumo[4], nuevoStock, stockMinimo, insumo[7]);
             }
         }
