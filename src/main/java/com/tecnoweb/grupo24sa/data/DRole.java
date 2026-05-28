@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DRole {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE ROLES
+    // CU - GESTIÃ“N DE ROLES
     // Atributos: descripcion, id, nombre
     // -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ public class DRole {
     public String save(String descripcion, String nombre) {
         String query = "INSERT INTO ROLE (descripcion, nombre) VALUES (?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, descripcion);
             ps.setString(2, nombre);
 
@@ -55,7 +57,9 @@ public class DRole {
     public String update(int id, String descripcion, String nombre) {
         String query = "UPDATE ROLE SET descripcion = ?, nombre = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, descripcion);
             ps.setString(2, nombre);
             ps.setInt(3, id);
@@ -75,7 +79,9 @@ public class DRole {
     public String delete(int id) {
         String query = "DELETE FROM ROLE WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -94,7 +100,9 @@ public class DRole {
         String query = "SELECT id, descripcion, nombre FROM ROLE ORDER BY nombre";
         List<String[]> roles = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -120,7 +128,9 @@ public class DRole {
     public String[] findOneById(int id) {
         String query = "SELECT id, descripcion, nombre FROM ROLE WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -150,7 +160,9 @@ public class DRole {
     public String[] findByNombre(String nombre) {
         String query = "SELECT id, descripcion, nombre FROM ROLE WHERE UPPER(nombre) = UPPER(?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, nombre);
             ResultSet rs = ps.executeQuery();
 
@@ -174,3 +186,4 @@ public class DRole {
         }
     }
 }
+

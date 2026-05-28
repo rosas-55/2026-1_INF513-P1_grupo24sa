@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DReceta {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE RECETAS
+    // CU - GESTIÃ“N DE RECETAS
     // Atributos: descripcion, id, producto_id (FK), tiempo_preparacion
     // -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ public class DReceta {
     public int save(String descripcion, int productoId, int tiempoPreparacion) {
         String query = "INSERT INTO RECETA (descripcion, producto_id, tiempo_preparacion) VALUES (?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, descripcion);
             ps.setInt(2, productoId);
             ps.setInt(3, tiempoPreparacion);
@@ -64,7 +66,9 @@ public class DReceta {
     public String update(int id, String descripcion, int productoId, int tiempoPreparacion) {
         String query = "UPDATE RECETA SET descripcion = ?, producto_id = ?, tiempo_preparacion = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, descripcion);
             ps.setInt(2, productoId);
             ps.setInt(3, tiempoPreparacion);
@@ -85,7 +89,9 @@ public class DReceta {
     public String delete(int id) {
         String query = "DELETE FROM RECETA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -104,7 +110,9 @@ public class DReceta {
         String query = "SELECT id, descripcion, producto_id, tiempo_preparacion FROM RECETA ORDER BY id";
         List<String[]> recetas = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -131,7 +139,9 @@ public class DReceta {
     public String[] findOneById(int id) {
         String query = "SELECT id, descripcion, producto_id, tiempo_preparacion FROM RECETA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -163,7 +173,9 @@ public class DReceta {
         String query = "SELECT id, descripcion, producto_id, tiempo_preparacion FROM RECETA WHERE producto_id = ?";
         List<String[]> recetas = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, productoId);
             ResultSet rs = ps.executeQuery();
 
@@ -184,3 +196,4 @@ public class DReceta {
         return recetas;
     }
 }
+

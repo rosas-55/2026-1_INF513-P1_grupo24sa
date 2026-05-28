@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DProveedor {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE PROVEEDORES
+    // CU - GESTIÃ“N DE PROVEEDORES
     // Atributos: direccion, id, nombre, telefono
     // -----------------------------------------------------------
 
@@ -36,7 +36,10 @@ public class DProveedor {
     public String save(String direccion, String nombre, String telefono) {
         String query = "INSERT INTO PROVEEDOR (direccion, nombre, telefono) VALUES (?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null)
+                throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, direccion);
             ps.setString(2, nombre);
             ps.setString(3, telefono);
@@ -56,7 +59,10 @@ public class DProveedor {
     public String update(int id, String direccion, String nombre, String telefono) {
         String query = "UPDATE PROVEEDOR SET direccion = ?, nombre = ?, telefono = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null)
+                throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, direccion);
             ps.setString(2, nombre);
             ps.setString(3, telefono);
@@ -77,7 +83,10 @@ public class DProveedor {
     public String delete(int id) {
         String query = "DELETE FROM PROVEEDOR WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null)
+                throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -96,7 +105,10 @@ public class DProveedor {
         String query = "SELECT id, direccion, nombre, telefono FROM PROVEEDOR ORDER BY nombre";
         List<String[]> proveedores = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null)
+                throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -123,7 +135,10 @@ public class DProveedor {
     public String[] findOneById(int id) {
         String query = "SELECT id, direccion, nombre, telefono FROM PROVEEDOR WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null)
+                throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 

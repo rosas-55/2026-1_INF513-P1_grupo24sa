@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DatabaseConection {
     private static final String DRIVER = "jdbc:postgresql://";
-    private Connection connection;
+    private static Connection connection;
     private String user;
     private String password;
     private String host;

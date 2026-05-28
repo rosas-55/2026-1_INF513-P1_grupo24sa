@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,19 +26,21 @@ public class DModulo {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE MÓDULOS
+    // CU - GESTIÃ“N DE MÃ“DULOS
     // Atributos: codigo (int), descripcion (int), estado (int),
     //            name (int), nivel (int)
     // Nota: Los tipos "int" del diagrama se interpretan como int en BD
     // -----------------------------------------------------------
 
     /**
-     * Crear nuevo módulo
+     * Crear nuevo mÃ³dulo
      */
     public String save(int codigo, String descripcion, int estado, String name, int nivel) {
         String query = "INSERT INTO MODULO (codigo, descripcion, estado, name, nivel) VALUES (?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, codigo);
             ps.setString(2, descripcion);
             ps.setInt(3, estado);
@@ -48,19 +50,21 @@ public class DModulo {
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Módulo creado exitosamente" : "Error: No se pudo crear el módulo";
+            return result > 0 ? "MÃ³dulo creado exitosamente" : "Error: No se pudo crear el mÃ³dulo";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Actualizar módulo existente
+     * Actualizar mÃ³dulo existente
      */
     public String update(int id, int codigo, String descripcion, int estado, String name, int nivel) {
         String query = "UPDATE MODULO SET codigo = ?, descripcion = ?, estado = ?, name = ?, nivel = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, codigo);
             ps.setString(2, descripcion);
             ps.setInt(3, estado);
@@ -71,38 +75,42 @@ public class DModulo {
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Módulo actualizado exitosamente" : "Error: No se pudo actualizar el módulo";
+            return result > 0 ? "MÃ³dulo actualizado exitosamente" : "Error: No se pudo actualizar el mÃ³dulo";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Eliminar módulo por ID
+     * Eliminar mÃ³dulo por ID
      */
     public String delete(int id) {
         String query = "DELETE FROM MODULO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Módulo eliminado exitosamente" : "Error: No se pudo eliminar el módulo";
+            return result > 0 ? "MÃ³dulo eliminado exitosamente" : "Error: No se pudo eliminar el mÃ³dulo";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Listar todos los módulos
+     * Listar todos los mÃ³dulos
      */
     public List<String[]> findAll() {
         String query = "SELECT id, codigo, descripcion, estado, name, nivel FROM MODULO ORDER BY nivel, name";
         List<String[]> modulos = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -118,7 +126,7 @@ public class DModulo {
 
             rs.close();
             ps.close();
-            System.out.println("Total módulos: " + modulos.size());
+            System.out.println("Total mÃ³dulos: " + modulos.size());
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -126,12 +134,14 @@ public class DModulo {
     }
 
     /**
-     * Buscar módulo por ID
+     * Buscar mÃ³dulo por ID
      */
     public String[] findOneById(int id) {
         String query = "SELECT id, codigo, descripcion, estado, name, nivel FROM MODULO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -158,3 +168,4 @@ public class DModulo {
         }
     }
 }
+

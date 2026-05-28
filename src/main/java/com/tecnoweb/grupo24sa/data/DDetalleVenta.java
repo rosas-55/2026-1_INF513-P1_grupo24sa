@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DDetalleVenta {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE DETALLE DE VENTA
+    // CU - GESTIÃ“N DE DETALLE DE VENTA
     // Atributos: cantidad, precio_unitario, producto_id, sub_total, venta_id
     // -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ public class DDetalleVenta {
     public String save(int cantidad, double precioUnitario, int productoId, double subTotal, int ventaId) {
         String query = "INSERT INTO DETALLE_VENTA (cantidad, precio_unitario, producto_id, sub_total, venta_id) VALUES (?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, cantidad);
             ps.setDouble(2, precioUnitario);
             ps.setInt(3, productoId);
@@ -58,7 +60,9 @@ public class DDetalleVenta {
     public String update(int id, int cantidad, double precioUnitario, int productoId, double subTotal) {
         String query = "UPDATE DETALLE_VENTA SET cantidad = ?, precio_unitario = ?, producto_id = ?, sub_total = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, cantidad);
             ps.setDouble(2, precioUnitario);
             ps.setInt(3, productoId);
@@ -80,7 +84,9 @@ public class DDetalleVenta {
     public String delete(int id) {
         String query = "DELETE FROM DETALLE_VENTA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -99,7 +105,9 @@ public class DDetalleVenta {
         String query = "SELECT id, cantidad, precio_unitario, producto_id, sub_total, venta_id FROM DETALLE_VENTA WHERE venta_id = ?";
         List<String[]> detalles = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, ventaId);
             ResultSet rs = ps.executeQuery();
 
@@ -129,7 +137,9 @@ public class DDetalleVenta {
     public String[] findOneById(int id) {
         String query = "SELECT id, cantidad, precio_unitario, producto_id, sub_total, venta_id FROM DETALLE_VENTA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -156,3 +166,4 @@ public class DDetalleVenta {
         }
     }
 }
+

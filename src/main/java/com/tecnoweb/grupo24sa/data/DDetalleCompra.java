@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DDetalleCompra {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE DETALLE DE COMPRA
+    // CU - GESTIÃ“N DE DETALLE DE COMPRA
     // Atributos: cantidad, compra_id, insumo_id, precio_unitario, subtotal
     // -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ public class DDetalleCompra {
     public String save(int cantidad, int compraId, int insumoId, double precioUnitario, double subtotal) {
         String query = "INSERT INTO DETALLE_COMPRA (cantidad, compra_id, insumo_id, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, cantidad);
             ps.setInt(2, compraId);
             ps.setInt(3, insumoId);
@@ -58,7 +60,9 @@ public class DDetalleCompra {
     public String update(int id, int cantidad, double precioUnitario, double subtotal) {
         String query = "UPDATE DETALLE_COMPRA SET cantidad = ?, precio_unitario = ?, subtotal = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, cantidad);
             ps.setDouble(2, precioUnitario);
             ps.setDouble(3, subtotal);
@@ -79,7 +83,9 @@ public class DDetalleCompra {
     public String delete(int id) {
         String query = "DELETE FROM DETALLE_COMPRA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -98,7 +104,9 @@ public class DDetalleCompra {
         String query = "SELECT id, cantidad, compra_id, insumo_id, precio_unitario, subtotal FROM DETALLE_COMPRA WHERE compra_id = ?";
         List<String[]> detalles = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, compraId);
             ResultSet rs = ps.executeQuery();
 
@@ -128,7 +136,9 @@ public class DDetalleCompra {
     public String[] findOneById(int id) {
         String query = "SELECT id, cantidad, compra_id, insumo_id, precio_unitario, subtotal FROM DETALLE_COMPRA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -155,3 +165,4 @@ public class DDetalleCompra {
         }
     }
 }
+

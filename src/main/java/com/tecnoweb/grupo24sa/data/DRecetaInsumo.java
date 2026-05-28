@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DRecetaInsumo {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE RECETA-INSUMO (tabla intermedia)
+    // CU - GESTIÃ“N DE RECETA-INSUMO (tabla intermedia)
     // Atributos: cantidad, insumo_id (FK), receta_id (FK)
     // -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ public class DRecetaInsumo {
     public String save(double cantidad, int insumoId, int recetaId) {
         String query = "INSERT INTO RECETA_INSUMO (cantidad, insumo_id, receta_id) VALUES (?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, cantidad);
             ps.setInt(2, insumoId);
             ps.setInt(3, recetaId);
@@ -56,7 +58,9 @@ public class DRecetaInsumo {
     public String update(int recetaId, int insumoId, double cantidad) {
         String query = "UPDATE RECETA_INSUMO SET cantidad = ? WHERE receta_id = ? AND insumo_id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, cantidad);
             ps.setInt(2, recetaId);
             ps.setInt(3, insumoId);
@@ -76,7 +80,9 @@ public class DRecetaInsumo {
     public String delete(int recetaId, int insumoId) {
         String query = "DELETE FROM RECETA_INSUMO WHERE receta_id = ? AND insumo_id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, recetaId);
             ps.setInt(2, insumoId);
 
@@ -97,7 +103,9 @@ public class DRecetaInsumo {
                 "FROM RECETA_INSUMO ri JOIN INSUMO i ON ri.insumo_id = i.id WHERE ri.receta_id = ?";
         List<String[]> items = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, recetaId);
             ResultSet rs = ps.executeQuery();
 
@@ -119,3 +127,4 @@ public class DRecetaInsumo {
         return items;
     }
 }
+

@@ -36,7 +36,9 @@ public class DProducto {
     public String save(String estado, String nombre, double precioVenta, int stockActual, Integer insumoId) {
         String query = "INSERT INTO PRODUCTO (estado, nombre, precio_venta, stock_actual, insumo_id) VALUES (?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, estado);
             ps.setString(2, nombre);
             ps.setDouble(3, precioVenta);
@@ -62,7 +64,9 @@ public class DProducto {
     public String update(int id, String estado, String nombre, double precioVenta, int stockActual, Integer insumoId) {
         String query = "UPDATE PRODUCTO SET estado = ?, nombre = ?, precio_venta = ?, stock_actual = ?, insumo_id = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, estado);
             ps.setString(2, nombre);
             ps.setDouble(3, precioVenta);
@@ -89,7 +93,9 @@ public class DProducto {
     public String updateStock(int id, int nuevoStock) {
         String query = "UPDATE PRODUCTO SET stock_actual = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, nuevoStock);
             ps.setInt(2, id);
 
@@ -108,7 +114,9 @@ public class DProducto {
     public String delete(int id) {
         String query = "DELETE FROM PRODUCTO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -127,7 +135,9 @@ public class DProducto {
         String query = "SELECT id, estado, nombre, precio_venta, stock_actual, insumo_id FROM PRODUCTO ORDER BY nombre";
         List<String[]> productos = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -157,7 +167,9 @@ public class DProducto {
     public String[] findOneById(int id) {
         String query = "SELECT id, estado, nombre, precio_venta, stock_actual, insumo_id FROM PRODUCTO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -191,7 +203,9 @@ public class DProducto {
     public String[] findByInsumoId(int insumoId) {
         String query = "SELECT id, estado, nombre, precio_venta, stock_actual, insumo_id FROM PRODUCTO WHERE insumo_id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, insumoId);
             ResultSet rs = ps.executeQuery();
 

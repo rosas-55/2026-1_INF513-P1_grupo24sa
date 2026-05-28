@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DInsumo {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE INSUMOS
+    // CU - GESTIÃ“N DE INSUMOS
     // Atributos: costo_unitario, descripcion, estado, id, nombre,
     //            stock_actual, stock_minimo, unidad_medida
     // -----------------------------------------------------------
@@ -39,7 +39,9 @@ public class DInsumo {
         String query = "INSERT INTO INSUMO (costo_unitario, descripcion, estado, nombre, stock_actual, stock_minimo, unidad_medida) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, costoUnitario);
             ps.setString(2, descripcion);
             ps.setString(3, estado);
@@ -65,7 +67,9 @@ public class DInsumo {
         String query = "UPDATE INSUMO SET costo_unitario = ?, descripcion = ?, estado = ?, nombre = ?, " +
                 "stock_actual = ?, stock_minimo = ?, unidad_medida = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, costoUnitario);
             ps.setString(2, descripcion);
             ps.setString(3, estado);
@@ -90,7 +94,9 @@ public class DInsumo {
     public String delete(int id) {
         String query = "DELETE FROM INSUMO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -109,7 +115,9 @@ public class DInsumo {
         String query = "SELECT id, costo_unitario, descripcion, estado, nombre, stock_actual, stock_minimo, unidad_medida FROM INSUMO ORDER BY nombre";
         List<String[]> insumos = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -140,7 +148,9 @@ public class DInsumo {
     public String[] findOneById(int id) {
         String query = "SELECT id, costo_unitario, descripcion, estado, nombre, stock_actual, stock_minimo, unidad_medida FROM INSUMO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -175,7 +185,9 @@ public class DInsumo {
     public String[] findOneByName(String nombre) {
         String query = "SELECT id, costo_unitario, descripcion, estado, nombre, stock_actual, stock_minimo, unidad_medida FROM INSUMO WHERE LOWER(nombre) = LOWER(?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, nombre.trim());
             ResultSet rs = ps.executeQuery();
 
@@ -205,13 +217,15 @@ public class DInsumo {
     }
 
     /**
-     * Listar insumos con stock bajo el mínimo
+     * Listar insumos con stock bajo el mÃ­nimo
      */
     public List<String[]> findStockBajoMinimo() {
         String query = "SELECT id, nombre, stock_actual, stock_minimo, unidad_medida FROM INSUMO WHERE stock_actual < stock_minimo ORDER BY nombre";
         List<String[]> insumos = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -226,10 +240,11 @@ public class DInsumo {
 
             rs.close();
             ps.close();
-            System.out.println("Insumos bajo stock mínimo: " + insumos.size());
+            System.out.println("Insumos bajo stock mÃ­nimo: " + insumos.size());
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
         return insumos;
     }
 }
+

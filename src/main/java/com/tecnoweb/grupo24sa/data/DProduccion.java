@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,17 +26,19 @@ public class DProduccion {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE PRODUCCIÓN
+    // CU - GESTIÃ“N DE PRODUCCIÃ“N
     // Atributos: cantidad_producida, fecha, id, receta_id (FK)
     // -----------------------------------------------------------
 
     /**
-     * Registrar nueva producción
+     * Registrar nueva producciÃ³n
      */
     public String save(double cantidadProducida, String fecha, int recetaId) {
         String query = "INSERT INTO PRODUCCION (cantidad_producida, fecha, receta_id) VALUES (?, ?::date, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, cantidadProducida);
             ps.setString(2, fecha);
             ps.setInt(3, recetaId);
@@ -44,19 +46,21 @@ public class DProduccion {
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Producción registrada exitosamente" : "Error: No se pudo registrar la producción";
+            return result > 0 ? "ProducciÃ³n registrada exitosamente" : "Error: No se pudo registrar la producciÃ³n";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Actualizar producción existente
+     * Actualizar producciÃ³n existente
      */
     public String update(int id, double cantidadProducida, String fecha, int recetaId) {
         String query = "UPDATE PRODUCCION SET cantidad_producida = ?, fecha = ?, receta_id = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, cantidadProducida);
             ps.setString(2, fecha);
             ps.setInt(3, recetaId);
@@ -65,38 +69,42 @@ public class DProduccion {
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Producción actualizada exitosamente" : "Error: No se pudo actualizar la producción";
+            return result > 0 ? "ProducciÃ³n actualizada exitosamente" : "Error: No se pudo actualizar la producciÃ³n";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Eliminar producción por ID
+     * Eliminar producciÃ³n por ID
      */
     public String delete(int id) {
         String query = "DELETE FROM PRODUCCION WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Producción eliminada exitosamente" : "Error: No se pudo eliminar la producción";
+            return result > 0 ? "ProducciÃ³n eliminada exitosamente" : "Error: No se pudo eliminar la producciÃ³n";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Listar toda la producción
+     * Listar toda la producciÃ³n
      */
     public List<String[]> findAll() {
         String query = "SELECT id, cantidad_producida, fecha, receta_id FROM PRODUCCION ORDER BY fecha DESC";
         List<String[]> producciones = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -110,7 +118,7 @@ public class DProduccion {
 
             rs.close();
             ps.close();
-            System.out.println("Total registros de producción: " + producciones.size());
+            System.out.println("Total registros de producciÃ³n: " + producciones.size());
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -118,12 +126,14 @@ public class DProduccion {
     }
 
     /**
-     * Buscar producción por ID
+     * Buscar producciÃ³n por ID
      */
     public String[] findOneById(int id) {
         String query = "SELECT id, cantidad_producida, fecha, receta_id FROM PRODUCCION WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -149,13 +159,15 @@ public class DProduccion {
     }
 
     /**
-     * Listar producción por receta
+     * Listar producciÃ³n por receta
      */
     public List<String[]> findByReceta(int recetaId) {
         String query = "SELECT id, cantidad_producida, fecha, receta_id FROM PRODUCCION WHERE receta_id = ? ORDER BY fecha DESC";
         List<String[]> producciones = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, recetaId);
             ResultSet rs = ps.executeQuery();
 
@@ -176,3 +188,4 @@ public class DProduccion {
         return producciones;
     }
 }
+

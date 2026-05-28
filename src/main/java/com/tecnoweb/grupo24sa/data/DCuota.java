@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DCuota {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE CUOTAS
+    // CU - GESTIÃ“N DE CUOTAS
     // Atributos: estado, fecha_pago, fecha_vencimiento, id,
     //            interes_mora (int), monto_pagado, nro_cuota,
     //            plan_pago, venta_id
@@ -41,7 +41,9 @@ public class DCuota {
         String query = "INSERT INTO CUOTA (estado, fecha_pago, fecha_vencimiento, interes_mora, monto_pagado, nro_cuota, plan_pago, venta_id) " +
                 "VALUES (?, ?::date, ?::date, ?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, estado);
             if (fechaPago == null || fechaPago.trim().equalsIgnoreCase("null") || fechaPago.trim().isEmpty()) {
                 ps.setNull(2, java.sql.Types.DATE);
@@ -70,7 +72,9 @@ public class DCuota {
     public String update(int id, String estado, String fechaPago, double montoPagado) {
         String query = "UPDATE CUOTA SET estado = ?, fecha_pago = ?::date, monto_pagado = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, estado);
             if (fechaPago == null || fechaPago.trim().equalsIgnoreCase("null") || fechaPago.trim().isEmpty()) {
                 ps.setNull(2, java.sql.Types.DATE);
@@ -95,7 +99,9 @@ public class DCuota {
     public String delete(int id) {
         String query = "DELETE FROM CUOTA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -115,7 +121,9 @@ public class DCuota {
                 "FROM CUOTA WHERE venta_id = ? ORDER BY nro_cuota";
         List<String[]> cuotas = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, ventaId);
             ResultSet rs = ps.executeQuery();
 
@@ -150,7 +158,9 @@ public class DCuota {
                 "FROM CUOTA c INNER JOIN VENTA v ON c.venta_id = v.id WHERE v.cliente_id = ? ORDER BY c.fecha_vencimiento ASC";
         List<String[]> cuotas = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, clienteId);
             ResultSet rs = ps.executeQuery();
 
@@ -183,7 +193,9 @@ public class DCuota {
         String query = "SELECT id, estado, fecha_pago, fecha_vencimiento, interes_mora, monto_pagado, nro_cuota, plan_pago, venta_id " +
                 "FROM CUOTA WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -213,3 +225,4 @@ public class DCuota {
         }
     }
 }
+

@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DCompra {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE COMPRAS
+    // CU - GESTIÃ“N DE COMPRAS
     // Atributos: estado, fecha, id, proveedor (FK), total
     // -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ public class DCompra {
     public int save(String estado, String fecha, int proveedorId, double total) {
         String query = "INSERT INTO Compra (estado, fecha, proveedor_id, total) VALUES (?, ?::date, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, estado);
             ps.setString(2, fecha);
             ps.setInt(3, proveedorId);
@@ -65,7 +67,9 @@ public class DCompra {
     public String updateEstado(int id, String estado) {
         String query = "UPDATE Compra SET estado = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, estado);
             ps.setInt(2, id);
 
@@ -84,7 +88,9 @@ public class DCompra {
     public String delete(int id) {
         String query = "DELETE FROM Compra WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -103,7 +109,9 @@ public class DCompra {
         String query = "SELECT id, estado, fecha, proveedor_id, total FROM Compra ORDER BY fecha DESC";
         List<String[]> compras = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -131,7 +139,9 @@ public class DCompra {
     public String[] findOneById(int id) {
         String query = "SELECT id, estado, fecha, proveedor_id, total FROM Compra WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -164,7 +174,9 @@ public class DCompra {
         String query = "SELECT id, estado, fecha, proveedor_id, total FROM Compra WHERE proveedor_id = ? ORDER BY fecha DESC";
         List<String[]> compras = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, proveedorId);
             ResultSet rs = ps.executeQuery();
 
@@ -186,3 +198,4 @@ public class DCompra {
         return compras;
     }
 }
+

@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -34,7 +34,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.save SQL: " + query);
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, cedula);
             ps.setString(2, celular);
             ps.setString(3, direccion);
@@ -61,7 +63,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.update SQL: " + query);
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, cedula);
             ps.setString(2, celular);
             ps.setString(3, direccion);
@@ -105,10 +109,10 @@ public class DUsuario {
     }
 
     /**
-     * Reactivación no soportada con el esquema actual
+     * ReactivaciÃ³n no soportada con el esquema actual
      */
     public String reactivate(int id) {
-        return "Error: El esquema actual no soporta reactivación porque la tabla User no tiene columna activo";
+        return "Error: El esquema actual no soporta reactivaciÃ³n porque la tabla User no tiene columna activo";
     }
 
     /**
@@ -125,7 +129,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.findAllUsers SQL: " + query);
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -154,7 +160,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.findOneById SQL: " + query + " params: id=" + id);
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -175,7 +183,7 @@ public class DUsuario {
     }
 
     /**
-     * Listar usuarios por rol específico
+     * Listar usuarios por rol especÃ­fico
      */
     public List<String[]> findByRole(String rol) {
         String query = "SELECT u.id, u.name, u.cedula, u.celular, u.direccion, u.email, u.password, " +
@@ -189,7 +197,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.findByRole SQL: " + query + " params: rol=" + rol);
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, rol);
             ResultSet rs = ps.executeQuery();
 
@@ -207,7 +217,7 @@ public class DUsuario {
     }
 
     /**
-     * Buscar usuario por cédula
+     * Buscar usuario por cÃ©dula
      */
     public String[] findByCedula(String cedula) {
         String query = "SELECT u.id, u.name, u.cedula, u.celular, u.direccion, u.email, u.password, " +
@@ -219,7 +229,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.findByCedula SQL: " + query + " params: cedula=" + cedula);
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, cedula);
             ResultSet rs = ps.executeQuery();
 
@@ -252,7 +264,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.authenticateUser SQL: " + query + " params: email=" + email + ", password=***");
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, email);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
@@ -286,7 +300,9 @@ public class DUsuario {
 
         try {
             System.out.println("DUsuario.findByEmail SQL: " + query + " params: email=" + email);
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 

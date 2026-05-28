@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,19 +26,21 @@ public class DAccion {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE ACCIONES
+    // CU - GESTIÃ“N DE ACCIONES
     // Atributos: codigo (int), descripcion (int), estado (int),
     //            name (int)
-    // Nota: Los tipos "int" del diagrama se interpretan según contexto
+    // Nota: Los tipos "int" del diagrama se interpretan segÃºn contexto
     // -----------------------------------------------------------
 
     /**
-     * Crear nueva acción
+     * Crear nueva acciÃ³n
      */
     public String save(int codigo, String descripcion, int estado, String name) {
         String query = "INSERT INTO ACCION (codigo, descripcion, estado, name) VALUES (?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, codigo);
             ps.setString(2, descripcion);
             ps.setInt(3, estado);
@@ -47,19 +49,21 @@ public class DAccion {
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Acción creada exitosamente" : "Error: No se pudo crear la acción";
+            return result > 0 ? "AcciÃ³n creada exitosamente" : "Error: No se pudo crear la acciÃ³n";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Actualizar acción existente
+     * Actualizar acciÃ³n existente
      */
     public String update(int id, int codigo, String descripcion, int estado, String name) {
         String query = "UPDATE ACCION SET codigo = ?, descripcion = ?, estado = ?, name = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, codigo);
             ps.setString(2, descripcion);
             ps.setInt(3, estado);
@@ -69,25 +73,27 @@ public class DAccion {
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Acción actualizada exitosamente" : "Error: No se pudo actualizar la acción";
+            return result > 0 ? "AcciÃ³n actualizada exitosamente" : "Error: No se pudo actualizar la acciÃ³n";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Eliminar acción por ID
+     * Eliminar acciÃ³n por ID
      */
     public String delete(int id) {
         String query = "DELETE FROM ACCION WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Acción eliminada exitosamente" : "Error: No se pudo eliminar la acción";
+            return result > 0 ? "AcciÃ³n eliminada exitosamente" : "Error: No se pudo eliminar la acciÃ³n";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
@@ -100,7 +106,9 @@ public class DAccion {
         String query = "SELECT id, codigo, descripcion, estado, name FROM ACCION ORDER BY name";
         List<String[]> acciones = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -123,12 +131,14 @@ public class DAccion {
     }
 
     /**
-     * Buscar acción por ID
+     * Buscar acciÃ³n por ID
      */
     public String[] findOneById(int id) {
         String query = "SELECT id, codigo, descripcion, estado, name FROM ACCION WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -154,3 +164,4 @@ public class DAccion {
         }
     }
 }
+

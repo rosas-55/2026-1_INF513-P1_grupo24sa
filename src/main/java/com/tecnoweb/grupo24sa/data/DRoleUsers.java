@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,7 +26,7 @@ public class DRoleUsers {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE ROLE-USERS (tabla intermedia)
+    // CU - GESTIÃ“N DE ROLE-USERS (tabla intermedia)
     // Atributos: role_id (FK), user_id (FK)
     // -----------------------------------------------------------
 
@@ -36,7 +36,9 @@ public class DRoleUsers {
     public String save(int roleId, int userId) {
         String query = "INSERT INTO ROLE_USERS (role_id, user_id) VALUES (?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, roleId);
             ps.setInt(2, userId);
 
@@ -55,7 +57,9 @@ public class DRoleUsers {
     public String delete(int roleId, int userId) {
         String query = "DELETE FROM ROLE_USERS WHERE role_id = ? AND user_id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, roleId);
             ps.setInt(2, userId);
 
@@ -75,7 +79,9 @@ public class DRoleUsers {
         String query = "SELECT ru.role_id, ru.user_id, r.nombre FROM ROLE_USERS ru JOIN ROLE r ON ru.role_id = r.id WHERE ru.user_id = ?";
         List<String[]> items = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
 
@@ -97,13 +103,15 @@ public class DRoleUsers {
     }
 
     /**
-     * Listar usuarios con un rol específico
+     * Listar usuarios con un rol especÃ­fico
      */
     public List<String[]> findByRole(int roleId) {
         String query = "SELECT ru.role_id, ru.user_id FROM ROLE_USERS ru WHERE ru.role_id = ?";
         List<String[]> items = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, roleId);
             ResultSet rs = ps.executeQuery();
 
@@ -122,3 +130,4 @@ public class DRoleUsers {
         return items;
     }
 }
+

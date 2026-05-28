@@ -1,4 +1,4 @@
-package com.tecnoweb.grupo24sa.data;
+﻿package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
@@ -26,58 +26,64 @@ public class DRoleModulo {
     }
 
     // -----------------------------------------------------------
-    // CU - GESTIÓN DE ROLE-MODULO (tabla intermedia)
-    // Representa qué módulos tiene acceso cada rol
+    // CU - GESTIÃ“N DE ROLE-MODULO (tabla intermedia)
+    // Representa quÃ© mÃ³dulos tiene acceso cada rol
     // Atributos: role_id (FK), modulo_id (FK)
     // -----------------------------------------------------------
 
     /**
-     * Asignar módulo a un rol
+     * Asignar mÃ³dulo a un rol
      */
     public String save(int roleId, int moduloId) {
         String query = "INSERT INTO ROLE_MODULO (role_id, modulo_id) VALUES (?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, roleId);
             ps.setInt(2, moduloId);
 
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Módulo asignado al rol exitosamente" : "Error: No se pudo asignar el módulo";
+            return result > 0 ? "MÃ³dulo asignado al rol exitosamente" : "Error: No se pudo asignar el mÃ³dulo";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Revocar módulo de un rol
+     * Revocar mÃ³dulo de un rol
      */
     public String delete(int roleId, int moduloId) {
         String query = "DELETE FROM ROLE_MODULO WHERE role_id = ? AND modulo_id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, roleId);
             ps.setInt(2, moduloId);
 
             int result = ps.executeUpdate();
             ps.close();
 
-            return result > 0 ? "Módulo revocado del rol exitosamente" : "Error: No se pudo revocar el módulo";
+            return result > 0 ? "MÃ³dulo revocado del rol exitosamente" : "Error: No se pudo revocar el mÃ³dulo";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
     }
 
     /**
-     * Listar módulos asignados a un rol
+     * Listar mÃ³dulos asignados a un rol
      */
     public List<String[]> findByRole(int roleId) {
         String query = "SELECT rm.role_id, rm.modulo_id, m.name FROM ROLE_MODULO rm " +
                 "JOIN MODULO m ON rm.modulo_id = m.id WHERE rm.role_id = ?";
         List<String[]> items = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, roleId);
             ResultSet rs = ps.executeQuery();
 
@@ -91,7 +97,7 @@ public class DRoleModulo {
 
             rs.close();
             ps.close();
-            System.out.println("Módulos del rol " + roleId + ": " + items.size());
+            System.out.println("MÃ³dulos del rol " + roleId + ": " + items.size());
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -99,13 +105,15 @@ public class DRoleModulo {
     }
 
     /**
-     * Listar roles que tienen acceso a un módulo
+     * Listar roles que tienen acceso a un mÃ³dulo
      */
     public List<String[]> findByModulo(int moduloId) {
         String query = "SELECT rm.role_id, rm.modulo_id FROM ROLE_MODULO rm WHERE rm.modulo_id = ?";
         List<String[]> items = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, moduloId);
             ResultSet rs = ps.executeQuery();
 
@@ -124,3 +132,4 @@ public class DRoleModulo {
         return items;
     }
 }
+

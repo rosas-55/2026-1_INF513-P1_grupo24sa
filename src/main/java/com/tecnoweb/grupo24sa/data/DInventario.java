@@ -39,7 +39,9 @@ public class DInventario {
         String query = "INSERT INTO INVENTARIO (cantidad, fecha, insumo_id, observacion, tipo_movimiento, costo_unitario, valor_total) " +
                 "VALUES (?, ?::date, ?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, cantidad);
             ps.setString(2, fecha);
             ps.setInt(3, insumoId);
@@ -63,7 +65,9 @@ public class DInventario {
     public String update(int id, double cantidad, String observacion) {
         String query = "UPDATE INVENTARIO SET cantidad = ?, observacion = ? WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setDouble(1, cantidad);
             ps.setString(2, observacion);
             ps.setInt(3, id);
@@ -83,7 +87,9 @@ public class DInventario {
     public String delete(int id) {
         String query = "DELETE FROM INVENTARIO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
 
             int result = ps.executeUpdate();
@@ -103,7 +109,9 @@ public class DInventario {
                 "FROM INVENTARIO ORDER BY fecha DESC";
         List<String[]> registros = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return registros;
+            PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -135,7 +143,9 @@ public class DInventario {
         String query = "SELECT id, cantidad, fecha, insumo_id, observacion, tipo_movimiento, costo_unitario, valor_total " +
                 "FROM INVENTARIO WHERE id = ?";
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return null;
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -172,7 +182,9 @@ public class DInventario {
                 "FROM INVENTARIO WHERE insumo_id = ? ORDER BY fecha DESC";
         List<String[]> registros = new ArrayList<>();
         try {
-            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return registros;
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, insumoId);
             ResultSet rs = ps.executeQuery();
 
