@@ -35,17 +35,18 @@ public class DInventario {
      * Registrar movimiento de inventario
      */
     public String save(double cantidad, String fecha, int insumoId,
-                       String metodoInventario, String observacion, String tipoMovimiento) {
-        String query = "INSERT INTO INVENTARIO (cantidad, fecha, insumo_id, metodo_inventario, observacion, tipo_movimiento) " +
-                "VALUES (?, ?::date, ?, ?, ?, ?)";
+                       String observacion, String tipoMovimiento, double costoUnitario, double valorTotal) {
+        String query = "INSERT INTO INVENTARIO (cantidad, fecha, insumo_id, observacion, tipo_movimiento, costo_unitario, valor_total) " +
+                "VALUES (?, ?::date, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
             ps.setDouble(1, cantidad);
             ps.setString(2, fecha);
             ps.setInt(3, insumoId);
-            ps.setString(4, metodoInventario);
-            ps.setString(5, observacion);
-            ps.setString(6, tipoMovimiento);
+            ps.setString(4, observacion);
+            ps.setString(5, tipoMovimiento);
+            ps.setDouble(6, costoUnitario);
+            ps.setDouble(7, valorTotal);
 
             int result = ps.executeUpdate();
             ps.close();
@@ -98,7 +99,7 @@ public class DInventario {
      * Listar todos los movimientos de inventario
      */
     public List<String[]> findAll() {
-        String query = "SELECT id, cantidad, fecha, insumo_id, metodo_inventario, observacion, tipo_movimiento " +
+        String query = "SELECT id, cantidad, fecha, insumo_id, observacion, tipo_movimiento, costo_unitario, valor_total " +
                 "FROM INVENTARIO ORDER BY fecha DESC";
         List<String[]> registros = new ArrayList<>();
         try {
@@ -106,14 +107,15 @@ public class DInventario {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] registro = new String[7];
+                String[] registro = new String[8];
                 registro[0] = String.valueOf(rs.getInt("id"));
                 registro[1] = String.valueOf(rs.getDouble("cantidad"));
                 registro[2] = rs.getString("fecha");
                 registro[3] = String.valueOf(rs.getInt("insumo_id"));
-                registro[4] = rs.getString("metodo_inventario");
+                registro[4] = String.valueOf(rs.getDouble("costo_unitario"));
                 registro[5] = rs.getString("observacion");
                 registro[6] = rs.getString("tipo_movimiento");
+                registro[7] = String.valueOf(rs.getDouble("valor_total"));
                 registros.add(registro);
             }
 
@@ -130,7 +132,7 @@ public class DInventario {
      * Buscar registro por ID
      */
     public String[] findOneById(int id) {
-        String query = "SELECT id, cantidad, fecha, insumo_id, metodo_inventario, observacion, tipo_movimiento " +
+        String query = "SELECT id, cantidad, fecha, insumo_id, observacion, tipo_movimiento, costo_unitario, valor_total " +
                 "FROM INVENTARIO WHERE id = ?";
         try {
             PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
@@ -138,14 +140,15 @@ public class DInventario {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                String[] registro = new String[7];
+                String[] registro = new String[8];
                 registro[0] = String.valueOf(rs.getInt("id"));
                 registro[1] = String.valueOf(rs.getDouble("cantidad"));
                 registro[2] = rs.getString("fecha");
                 registro[3] = String.valueOf(rs.getInt("insumo_id"));
-                registro[4] = rs.getString("metodo_inventario");
+                registro[4] = String.valueOf(rs.getDouble("costo_unitario"));
                 registro[5] = rs.getString("observacion");
                 registro[6] = rs.getString("tipo_movimiento");
+                registro[7] = String.valueOf(rs.getDouble("valor_total"));
 
                 rs.close();
                 ps.close();
@@ -165,7 +168,7 @@ public class DInventario {
      * Listar movimientos por insumo
      */
     public List<String[]> findByInsumo(int insumoId) {
-        String query = "SELECT id, cantidad, fecha, insumo_id, metodo_inventario, observacion, tipo_movimiento " +
+        String query = "SELECT id, cantidad, fecha, insumo_id, observacion, tipo_movimiento, costo_unitario, valor_total " +
                 "FROM INVENTARIO WHERE insumo_id = ? ORDER BY fecha DESC";
         List<String[]> registros = new ArrayList<>();
         try {
@@ -174,14 +177,15 @@ public class DInventario {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] registro = new String[7];
+                String[] registro = new String[8];
                 registro[0] = String.valueOf(rs.getInt("id"));
                 registro[1] = String.valueOf(rs.getDouble("cantidad"));
                 registro[2] = rs.getString("fecha");
                 registro[3] = String.valueOf(rs.getInt("insumo_id"));
-                registro[4] = rs.getString("metodo_inventario");
+                registro[4] = String.valueOf(rs.getDouble("costo_unitario"));
                 registro[5] = rs.getString("observacion");
                 registro[6] = rs.getString("tipo_movimiento");
+                registro[7] = String.valueOf(rs.getDouble("valor_total"));
                 registros.add(registro);
             }
 

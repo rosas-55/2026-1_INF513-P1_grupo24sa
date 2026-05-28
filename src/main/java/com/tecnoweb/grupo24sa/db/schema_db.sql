@@ -33,7 +33,8 @@ CREATE TABLE `Producto` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `estado` INT,
     `nombre` VARCHAR(150),
-    `precio_venta` DECIMAL(10,2)
+    `precio_venta` DECIMAL(10,2),
+    `stock_actual` INT
 );
 
 CREATE TABLE `Insumo` (
@@ -121,9 +122,10 @@ CREATE TABLE `Inventario` (
     `cantidad` INT,
     `fecha` DATETIME,
     `insumo_id` INT,
-    `metodo_inventario` VARCHAR(100),
     `observacion` VARCHAR(255),
     `tipo_movimiento` VARCHAR(50),
+    `costo_unitario` numeric(10, 2),
+    `valor_total` numeric(10, 2),
     FOREIGN KEY (`insumo_id`) REFERENCES `Insumo`(`id`)
 );
 
