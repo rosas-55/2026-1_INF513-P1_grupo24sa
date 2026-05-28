@@ -32,7 +32,7 @@ public class BInventario {
      * @param tipoMovimiento   INGRESO o SALIDA
      */
     public String registrarMovimiento(double cantidad, String fecha, int insumoId,
-                                       String metodoInventario, String observacion,
+                                       double costoUnitario, String observacion,
                                        String tipoMovimiento) {
         if (cantidad <= 0) {
             return "Error: La cantidad debe ser mayor a 0";
@@ -55,36 +55,48 @@ public class BInventario {
             return "Error: La fecha del movimiento es obligatoria";
         }
 
+        double stockActual = Double.parseDouble(insumo[5]);
+
         // Validar stock suficiente para SALIDA
         if (tipoUpper.equals("SALIDA")) {
-            double stockActual = Double.parseDouble(insumo[5]);
             if (cantidad > stockActual) {
                 return String.format("Error: Stock insuficiente. Stock actual: %.2f, Cantidad solicitada: %.2f",
                         stockActual, cantidad);
             }
         }
 
-        // Normalizar método de inventario
-        String metodo = (metodoInventario == null || metodoInventario.trim().isEmpty())
-                ? "PROMEDIO" : metodoInventario.trim().toUpperCase();
+        // Definir costo unitario del movimiento
+        double costoMovimiento = costoUnitario;
+        if (tipoUpper.equals("SALIDA") || costoMovimiento <= 0) {
+            costoMovimiento = Double.parseDouble(insumo[1]);
+        }
+
+        double valorTotal = cantidad * costoMovimiento;
+        valorTotal = Math.round(valorTotal * 100.0) / 100.0;
 
         // Registrar el movimiento
         String resultado = dInventario.save(cantidad, fecha.trim(), insumoId,
-                metodo, observacion == null ? "" : observacion.trim(), tipoUpper);
+                observacion == null ? "" : observacion.trim(), tipoUpper, costoMovimiento, valorTotal);
 
         if (!resultado.startsWith("Movimiento")) {
             return resultado;
         }
 
-        // Actualizar stock del insumo
-        double stockActual = Double.parseDouble(insumo[5]);
+        // Actualizar stock y costo promedio ponderado del insumo
         double nuevoStock = tipoUpper.equals("INGRESO")
                 ? stockActual + cantidad
                 : stockActual - cantidad;
 
-        double costoUnitario = Double.parseDouble(insumo[1]);
+        double nuevoCostoUnitario = Double.parseDouble(insumo[1]);
+        if (tipoUpper.equals("INGRESO")) {
+            if (nuevoStock > 0) {
+                nuevoCostoUnitario = ((stockActual * nuevoCostoUnitario) + (cantidad * costoMovimiento)) / nuevoStock;
+                nuevoCostoUnitario = Math.round(nuevoCostoUnitario * 100.0) / 100.0;
+            }
+        }
+
         double stockMinimo   = Double.parseDouble(insumo[6]);
-        dInsumo.update(insumoId, costoUnitario, insumo[2], insumo[3],
+        dInsumo.update(insumoId, nuevoCostoUnitario, insumo[2], insumo[3],
                 insumo[4], nuevoStock, stockMinimo, insumo[7]);
 
         String avisoStock = "";

@@ -33,13 +33,14 @@ public class DProducto {
     /**
      * Crear nuevo producto
      */
-    public String save(String estado, String nombre, double precioVenta) {
-        String query = "INSERT INTO PRODUCTO (estado, nombre, precio_venta) VALUES (?, ?, ?)";
+    public String save(String estado, String nombre, double precioVenta, int stockActual) {
+        String query = "INSERT INTO PRODUCTO (estado, nombre, precio_venta, stock_actual) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
             ps.setString(1, estado);
             ps.setString(2, nombre);
             ps.setDouble(3, precioVenta);
+            ps.setInt(4, stockActual);
 
             int result = ps.executeUpdate();
             ps.close();
@@ -53,19 +54,39 @@ public class DProducto {
     /**
      * Actualizar producto existente
      */
-    public String update(int id, String estado, String nombre, double precioVenta) {
-        String query = "UPDATE PRODUCTO SET estado = ?, nombre = ?, precio_venta = ? WHERE id = ?";
+    public String update(int id, String estado, String nombre, double precioVenta, int stockActual) {
+        String query = "UPDATE PRODUCTO SET estado = ?, nombre = ?, precio_venta = ?, stock_actual = ? WHERE id = ?";
         try {
             PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
             ps.setString(1, estado);
             ps.setString(2, nombre);
             ps.setDouble(3, precioVenta);
-            ps.setInt(4, id);
+            ps.setInt(4, stockActual);
+            ps.setInt(5, id);
 
             int result = ps.executeUpdate();
             ps.close();
 
             return result > 0 ? "Producto actualizado exitosamente" : "Error: No se pudo actualizar el producto";
+        } catch (SQLException e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Actualizar solo el stock de un producto
+     */
+    public String updateStock(int id, int nuevoStock) {
+        String query = "UPDATE PRODUCTO SET stock_actual = ? WHERE id = ?";
+        try {
+            PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
+            ps.setInt(1, nuevoStock);
+            ps.setInt(2, id);
+
+            int result = ps.executeUpdate();
+            ps.close();
+
+            return result > 0 ? "Stock de producto actualizado" : "Error: No se pudo actualizar el stock del producto";
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
@@ -93,18 +114,19 @@ public class DProducto {
      * Listar todos los productos
      */
     public List<String[]> findAll() {
-        String query = "SELECT id, estado, nombre, precio_venta FROM PRODUCTO ORDER BY nombre";
+        String query = "SELECT id, estado, nombre, precio_venta, stock_actual FROM PRODUCTO ORDER BY nombre";
         List<String[]> productos = new ArrayList<>();
         try {
             PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] producto = new String[4];
+                String[] producto = new String[5];
                 producto[0] = String.valueOf(rs.getInt("id"));
                 producto[1] = rs.getString("estado");
                 producto[2] = rs.getString("nombre");
                 producto[3] = String.valueOf(rs.getDouble("precio_venta"));
+                producto[4] = String.valueOf(rs.getInt("stock_actual"));
                 productos.add(producto);
             }
 
@@ -121,18 +143,19 @@ public class DProducto {
      * Buscar producto por ID
      */
     public String[] findOneById(int id) {
-        String query = "SELECT id, estado, nombre, precio_venta FROM PRODUCTO WHERE id = ?";
+        String query = "SELECT id, estado, nombre, precio_venta, stock_actual FROM PRODUCTO WHERE id = ?";
         try {
             PreparedStatement ps = databaseConection.openConnection().prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                String[] producto = new String[4];
+                String[] producto = new String[5];
                 producto[0] = String.valueOf(rs.getInt("id"));
                 producto[1] = rs.getString("estado");
                 producto[2] = rs.getString("nombre");
                 producto[3] = String.valueOf(rs.getDouble("precio_venta"));
+                producto[4] = String.valueOf(rs.getInt("stock_actual"));
 
                 rs.close();
                 ps.close();
