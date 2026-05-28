@@ -206,9 +206,8 @@ public class CommandInterpreter {
                 "eliminar(id) | listarPorVenta(venta_id) | buscar(id)\r\n" +
                 "\r\n" +
                 "=== INVENTARIO ===\r\n" +
-                "registrar(cantidad,fecha,insumo_id,metodo_inventario,observacion,tipo_movimiento)\r\n" +
+                "registrar(cantidad,fecha,insumo_id,costo_unitario,observacion,tipo_movimiento)\r\n" +
                 "  tipo_movimiento: INGRESO o SALIDA\r\n" +
-                "  metodo_inventario: FIFO, LIFO o PROMEDIO\r\n" +
                 "actualizar(id,cantidad,observacion)\r\n" +
                 "eliminar(id) | listar() | buscar(id) | listarPorInsumo(insumo_id)\r\n" +
                 "\r\n" +

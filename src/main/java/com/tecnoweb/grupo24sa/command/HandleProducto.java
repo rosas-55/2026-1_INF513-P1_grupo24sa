@@ -56,6 +56,7 @@ public class HandleProducto {
               .append(" | Estado:").append(p[1])
               .append(" | Nombre:").append(p[2])
               .append(" | Precio:").append(p[3])
+              .append(" | Stock:").append(p[4])
               .append("\n");
         }
         return sb.toString();
@@ -65,6 +66,6 @@ public class HandleProducto {
     private static String buscar(BProducto b, String params) {
         String[] p = b.buscarPorId(Integer.parseInt(params.trim()));
         if (p == null) return "Producto no encontrado";
-        return "ID: " + p[0] + "\nNombre: " + p[2] + "\nEstado: " + p[1] + "\nPrecio: " + p[3];
+        return "ID: " + p[0] + "\nNombre: " + p[2] + "\nEstado: " + p[1] + "\nPrecio: " + p[3] + "\nStock: " + p[4];
     }
 }

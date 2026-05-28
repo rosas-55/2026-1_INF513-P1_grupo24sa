@@ -5,6 +5,10 @@ import com.tecnoweb.grupo24sa.data.DUsuario;
 import com.tecnoweb.grupo24sa.data.DProducto;
 import com.tecnoweb.grupo24sa.data.DDetalleVenta;
 import com.tecnoweb.grupo24sa.data.DCuota;
+import com.tecnoweb.grupo24sa.data.DInsumo;
+import com.tecnoweb.grupo24sa.data.DInventario;
+import com.tecnoweb.grupo24sa.data.DReceta;
+import com.tecnoweb.grupo24sa.data.DRecetaInsumo;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +24,10 @@ public class BVenta {
     private final DProducto dProducto;
     private final DDetalleVenta dDetalleVenta;
     private final DCuota dCuota;
+    private final DInsumo dInsumo;
+    private final DInventario dInventario;
+    private final DReceta dReceta;
+    private final DRecetaInsumo dRecetaInsumo;
 
     public BVenta() {
         this.dVenta = new DVenta();
@@ -27,6 +35,10 @@ public class BVenta {
         this.dProducto = new DProducto();
         this.dDetalleVenta = new DDetalleVenta();
         this.dCuota = new DCuota();
+        this.dInsumo = new DInsumo();
+        this.dInventario = new DInventario();
+        this.dReceta = new DReceta();
+        this.dRecetaInsumo = new DRecetaInsumo();
     }
 
     /**
@@ -113,7 +125,7 @@ public class BVenta {
             return "Error: No se pudo registrar la venta";
         }
 
-        // Registrar cada detalle de venta
+        // Registrar cada detalle de venta e implementar descuento automático de stock
         for (String[] item : items) {
             int prodId = Integer.parseInt(item[0]);
             int cantidad = Integer.parseInt(item[1]);
@@ -122,6 +134,58 @@ public class BVenta {
             double subtotal = cantidad * precioVenta;
 
             dDetalleVenta.save(cantidad, precioVenta, prodId, subtotal, ventaId);
+
+            if (prod != null) {
+                // 1. Descontar del stock del producto terminado
+                int stockActualProd = (prod.length > 4 && prod[4] != null) ? Integer.parseInt(prod[4]) : 0;
+                int nuevoStockProd = stockActualProd - cantidad;
+                dProducto.updateStock(prodId, nuevoStockProd);
+
+                // 2. Descontar insumos asociados (Inventario Permanente)
+                List<String[]> recetas = dReceta.findByProducto(prodId);
+                if (!recetas.isEmpty()) {
+                    // Caso A: Con receta (Plato preparado) -> Descontar cada ingrediente
+                    int recetaId = Integer.parseInt(recetas.get(0)[0]);
+                    List<String[]> ingredientes = dRecetaInsumo.findByReceta(recetaId);
+                    for (String[] ingrediente : ingredientes) {
+                        double cantidadIngredienteRequerida = Double.parseDouble(ingrediente[0]) * cantidad;
+                        int insumoId = Integer.parseInt(ingrediente[1]);
+                        String[] insumo = dInsumo.findOneById(insumoId);
+                        if (insumo != null) {
+                            double stockActualInsumo = Double.parseDouble(insumo[5]);
+                            double costoUnitario = Double.parseDouble(insumo[1]);
+                            double nuevoStockInsumo = stockActualInsumo - cantidadIngredienteRequerida;
+                            double stockMinimo = Double.parseDouble(insumo[6]);
+
+                            dInsumo.update(insumoId, costoUnitario, insumo[2], insumo[3],
+                                    insumo[4], nuevoStockInsumo, stockMinimo, insumo[7]);
+
+                            double subtotalInsumo = cantidadIngredienteRequerida * costoUnitario;
+                            subtotalInsumo = Math.round(subtotalInsumo * 100.0) / 100.0;
+                            dInventario.save(cantidadIngredienteRequerida, fecha.trim(), insumoId,
+                                    "Venta ID " + ventaId + " - Consumo receta ID " + recetaId, "SALIDA", costoUnitario, subtotalInsumo);
+                        }
+                    }
+                } else {
+                    // Caso B: Sin receta (Producto directo, ej: Gaseosa) -> Buscar insumo homónimo
+                    String[] insumo = dInsumo.findOneByName(prod[2]); // prod[2] es el nombre del producto
+                    if (insumo != null) {
+                        int insumoId = Integer.parseInt(insumo[0]);
+                        double stockActualInsumo = Double.parseDouble(insumo[5]);
+                        double costoUnitario = Double.parseDouble(insumo[1]);
+                        double nuevoStockInsumo = stockActualInsumo - cantidad;
+                        double stockMinimo = Double.parseDouble(insumo[6]);
+
+                        dInsumo.update(insumoId, costoUnitario, insumo[2], insumo[3],
+                                insumo[4], nuevoStockInsumo, stockMinimo, insumo[7]);
+
+                        double subtotalInsumo = cantidad * costoUnitario;
+                        subtotalInsumo = Math.round(subtotalInsumo * 100.0) / 100.0;
+                        dInventario.save(cantidad, fecha.trim(), insumoId,
+                                "Venta ID " + ventaId + " - Producto directo sin receta", "SALIDA", costoUnitario, subtotalInsumo);
+                    }
+                }
+            }
         }
 
         // Generar cuotas automáticamente si es venta a crédito
