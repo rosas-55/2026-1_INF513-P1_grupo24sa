@@ -133,10 +133,10 @@ public class CommandInterpreter {
             case "compra":
                 return new ReporteResponse(HandleCompra.execute(command, params));
             case "venta":
-                return new ReporteResponse(HandleVenta.execute(command, params));
+                return HandleVenta.execute(command, params);
 
             case "cuota":
-                return new ReporteResponse(HandleCuota.execute(command, params));
+                return HandleCuota.execute(command, params);
             case "inventario":
                 return new ReporteResponse(HandleInventario.execute(command, params));
             case "produccion":

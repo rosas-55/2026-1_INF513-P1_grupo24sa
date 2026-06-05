@@ -22,6 +22,21 @@ public class BCuota {
     }
 
     /**
+     * Obtiene una lista cruda de las cuotas pendientes o en mora de un cliente
+     */
+    public List<String[]> obtenerCuotasPendientes(int clienteId) {
+        List<String[]> pendientes = new java.util.ArrayList<>();
+        List<String[]> lista = dCuota.findByCliente(clienteId);
+        for (String[] c : lista) {
+            String estado = c[1];
+            if (estado.equalsIgnoreCase("PENDIENTE") || estado.equalsIgnoreCase("EN_MORA")) {
+                pendientes.add(c);
+            }
+        }
+        return pendientes;
+    }
+
+    /**
      * Lista todas las cuotas de un cliente y muestra la morosidad si corresponde
      */
     public String listarPorCliente(int clienteId) {

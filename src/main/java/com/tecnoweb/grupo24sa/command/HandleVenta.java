@@ -1,7 +1,14 @@
 package com.tecnoweb.grupo24sa.command;
 
 import com.tecnoweb.grupo24sa.business.BVenta;
+import com.tecnoweb.grupo24sa.services.pagofacil.pagoFacilService;
+import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrRequest;
+import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrResponse;
+import com.tecnoweb.grupo24sa.utils.ReporteResponse;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,36 +17,36 @@ import java.util.ArrayList;
  */
 public class HandleVenta {
 
-    public static String execute(String command, String params) {
+    public static ReporteResponse execute(String command, String params) {
         BVenta bVenta = new BVenta();
         try {
             switch (command) {
                 case "registrar":        return registrar(bVenta, params);
-                case "actualizarEstado": return actualizarEstado(bVenta, params);
-                case "eliminar":         return eliminar(bVenta, params);
-                case "listar":           return listar(bVenta);
-                case "buscar":           return buscar(bVenta, params);
-                case "listarPorCliente": return listarPorCliente(bVenta, params);
-                default:                 return "Comando no implementado: " + command;
+                case "actualizarEstado": return new ReporteResponse(actualizarEstado(bVenta, params));
+                case "eliminar":         return new ReporteResponse(eliminar(bVenta, params));
+                case "listar":           return new ReporteResponse(listar(bVenta));
+                case "buscar":           return new ReporteResponse(buscar(bVenta, params));
+                case "listarPorCliente": return new ReporteResponse(listarPorCliente(bVenta, params));
+                default:                 return new ReporteResponse("Comando no implementado: " + command);
             }
         } catch (NumberFormatException e) {
-            return "Error: Parámetro numérico inválido - " + e.getMessage();
+            return new ReporteResponse("Error: Parámetro numérico inválido - " + e.getMessage());
         } catch (Exception e) {
-            return "Error: " + e.getMessage();
+            return new ReporteResponse("Error: " + e.getMessage());
         }
     }
 
     /** registrar(cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, vendedor_id, [producto_id1;cantidad1], ...) */
-    private static String registrar(BVenta b, String params) {
+    private static ReporteResponse registrar(BVenta b, String params) {
         String[] p = params.split(",");
-        if (p.length < 7) return "Error: Uso: registrar(cliente_id,estado,fecha,interes_mora,nro_cuotas,tipo,vendedor_id,[producto_id1;cantidad1],...)";
+        if (p.length < 7) return new ReporteResponse("Error: Uso: registrar(cliente_id,estado,fecha,interes_mora,nro_cuotas,tipo,vendedor_id,[producto_id1;cantidad1],...)");
         
         int clienteId = Integer.parseInt(p[0].trim());
         String estado = p[1].trim();
         String fecha = p[2].trim();
         double interesMora = Double.parseDouble(p[3].trim());
         int nroCuotas = Integer.parseInt(p[4].trim());
-        String tipo = p[5].trim();
+        String tipo = p[5].trim().toUpperCase();
         int vendedorId = Integer.parseInt(p[6].trim());
         
         List<String[]> items = new ArrayList<>();
@@ -54,7 +61,52 @@ public class HandleVenta {
             }
         }
         
-        return b.registrarVenta(clienteId, estado, fecha, interesMora, nroCuotas, tipo, vendedorId, items);
+        String resDb = b.registrarVenta(clienteId, estado, fecha, interesMora, nroCuotas, tipo, vendedorId, items);
+        ReporteResponse response = new ReporteResponse(resDb);
+
+        // Si la venta fue exitosa y es al contado, generar el QR de PagoFacil
+        if (resDb.startsWith("Venta registrada exitosamente") && tipo.equals("CONTADO")) {
+            pagoFacilService pfService = new pagoFacilService();
+            if (pfService.autenticar()) {
+                try {
+                    QrRequest req = new QrRequest();
+                    req.setPaymentMethod(34); // as per docs example
+                    req.setClientName("Cliente " + clienteId);
+                    req.setDocumentType(1);
+                    req.setDocumentId("000000"); // Placeholder
+                    req.setPhoneNumber("70000000"); // Placeholder
+                    req.setEmail("correo@ejemplo.com"); // Placeholder
+                    req.setPaymentNumber("VTA-" + System.currentTimeMillis());
+                    req.setAmount(0.1); // Test amount as requested
+                    req.setCurrency(2); // BOB
+                    req.setClientCode(String.valueOf(clienteId));
+                    req.setCallbackUrl("https://webhook.site/callback-test");
+
+                    QrResponse qrRes = pfService.generarQR(req);
+                    if (qrRes != null && qrRes.getError() == 0 && qrRes.getValues() != null) {
+                        String base64Data = qrRes.getValues().getQrBase64();
+                        if (base64Data.startsWith("data:image/png;base64,")) {
+                            base64Data = base64Data.substring(22);
+                        }
+                        byte[] imageBytes = Base64.getDecoder().decode(base64Data);
+                        File qrFile = new File("qr_venta_" + System.currentTimeMillis() + ".png");
+                        try (FileOutputStream fos = new FileOutputStream(qrFile)) {
+                            fos.write(imageBytes);
+                        }
+                        response.addArchivoAdjunto(qrFile);
+                        response.setTextoRespuesta(resDb + "\n\nSe ha adjuntado el código QR de PagoFácil para el pago al contado.");
+                    } else {
+                        response.setTextoRespuesta(resDb + "\n\n(Advertencia: No se pudo generar el QR de PagoFácil)");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error generando QR: " + e.getMessage());
+                }
+            } else {
+                response.setTextoRespuesta(resDb + "\n\n(Advertencia: Falló la autenticación con PagoFácil, no se generó QR)");
+            }
+        }
+
+        return response;
     }
 
     /** actualizarEstado(id, estado) */

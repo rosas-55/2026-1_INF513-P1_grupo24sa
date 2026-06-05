@@ -1,12 +1,20 @@
 package com.tecnoweb.grupo24sa.ConfigDB;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConection {
     private static final String DRIVER = "jdbc:postgresql://";
-    private static Connection connection;
+    
+    // Pool estático: una sola piscina para toda la aplicación
+    private static HikariDataSource dataSource; 
+
+    // Conexión instanciada: cada objeto de DB usa temporalmente su propia conexión
+    private Connection currentConnection; 
+
     private String user;
     private String password;
     private String host;
@@ -20,29 +28,58 @@ public class DatabaseConection {
         this.host = host;
         this.port = port;
         this.db_name = db_name;
-        this.url = DRIVER + host + ":" + port + "/" + db_name; //localhost:5432/tecnodb
+        this.url = DRIVER + host + ":" + port + "/" + db_name; 
+
+        // Inicializar el pool solo la primera vez que se instancia DatabaseConection
+        if (dataSource == null) {
+            initPool();
+        }
     }
 
+    private synchronized void initPool() {
+        if (dataSource == null) {
+            try {
+                HikariConfig config = new HikariConfig();
+                config.setJdbcUrl(this.url);
+                config.setUsername(this.user);
+                config.setPassword(this.password);
+                
+                // Configuración óptima del pool
+                config.setMaximumPoolSize(20); // Máximo 20 conexiones simultáneas
+                config.setMinimumIdle(5);      // Mantiene 5 conexiones listas
+                config.setConnectionTimeout(30000); // 30 segundos de espera máximo
+
+                dataSource = new HikariDataSource(config);
+                System.out.println("HikariCP Connection Pool inicializado correctamente.");
+            } catch (Exception e) {
+                System.err.println("Error inicializando HikariCP: " + e.getMessage());
+            }
+        }
+    }
 
     public Connection openConnection() {
         try {
-            if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection(url, user, password);
-                System.out.println("Conectado a la BD");
+            // Si no tenemos una conexión activa en ESTA instancia, pedimos una al pool
+            if (currentConnection == null || currentConnection.isClosed()) {
+                currentConnection = dataSource.getConnection();
             }
         } catch (SQLException ex) {
-            System.err.println("error en la conexion a la base de datos, connection databaseConnection.java: " + ex.getMessage());
+            System.err.println("Error al obtener conexion del pool: " + ex.getMessage());
             ex.printStackTrace();
         }
-        return connection;
+        return currentConnection;
     }
-
 
     public void closeConnection() {
         try {
-            connection.close();
+            // Al llamar a close() en una conexión de Hikari, 
+            // no se destruye, simplemente se "devuelve" al pool para que otro proceso la use.
+            if (currentConnection != null && !currentConnection.isClosed()) {
+                currentConnection.close();
+                currentConnection = null;
+            }
         } catch (SQLException ex) {
-            System.err.print("Error al cerrar la conexion a la base de datos, CloseConnection, databaseConnection.java");
+            System.err.print("Error al devolver la conexion al pool: " + ex.getMessage());
         }
     }
 }
