@@ -58,26 +58,42 @@ public class MailVerificationThread implements Runnable {
                 int count = getEmailCount();
                 if (count > 0) {
                     emails = getEmails(count);
-                    System.out.println(emails);
+                    System.out.println("Nuevos correos: " + emails.size());
                     deleteEmails(count);
                 }
                 output.writeBytes(Command.quit());
                 input.readLine();
-                input.close();
-                output.close();
-                socket.close();
-                System.out.println("************** Conexion cerrada ************");
 
-                if (count > 0) {
+                // Procesar correos
+                if (count > 0 && emailEventListener != null) {
                     emailEventListener.onReceiveEmailEvent(emails);
                 }
 
-                Thread.sleep(5000);
-
             } catch (IOException ex) {
-                Logger.getLogger(MailVerificationThread.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(MailVerificationThread.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("Error de red (POP3): " + ex.getMessage());
+            } catch (Exception ex) {
+                System.err.println("Error general procesando correo: " + ex.getMessage());
+            } finally {
+                // Siempre cerramos la conexión de forma segura
+                try {
+                    if (input != null)
+                        input.close();
+                    if (output != null)
+                        output.close();
+                    if (socket != null && !socket.isClosed())
+                        socket.close();
+                    System.out.println("************** Conexion cerrada ************");
+                } catch (IOException e) {
+                    System.err.println("Error cerrando sockets: " + e.getMessage());
+                }
+
+                // El sleep DEBE estar en el finally para garantizar la espera
+                // incluso si hubo error, evitando así colapsar/atacar el servidor.
+                try {
+                    Thread.sleep(10000); // 10 segundos
+                } catch (InterruptedException ex) {
+                    System.err.println("Hilo interrumpido: " + ex.getMessage());
+                }
             }
         }
     }
