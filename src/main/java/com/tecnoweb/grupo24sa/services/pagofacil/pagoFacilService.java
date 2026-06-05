@@ -73,6 +73,8 @@ public class pagoFacilService {
                     .uri(URI.create(baseUrl + "/login"))
                     .header("Content-Type", "application/json")
                     .header("Accept", "application/json")
+                    .header("tctokenservice", this.tcTokenService)
+                    .header("tctokensecret", this.tcTokenSecret)
                     .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
                     .build();
 

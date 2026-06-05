@@ -8,6 +8,7 @@ import com.tecnoweb.grupo24sa.utils.ReporteResponse;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -20,12 +21,18 @@ public class HandleCuota {
         BCuota bCuota = new BCuota();
         try {
             switch (command) {
-                case "pagar":        return new ReporteResponse(pagar(bCuota, params));
-                case "eliminar":     return new ReporteResponse(eliminar(bCuota, params));
-                case "listarPorVenta": return new ReporteResponse(listarPorVenta(bCuota, params));
-                case "buscar":       return new ReporteResponse(buscar(bCuota, params));
-                case "listarPorCliente": return listarPorCliente(bCuota, params);
-                default:             return new ReporteResponse("Comando no implementado: " + command);
+                case "pagar":
+                    return new ReporteResponse(pagar(bCuota, params));
+                case "eliminar":
+                    return new ReporteResponse(eliminar(bCuota, params));
+                case "listarPorVenta":
+                    return new ReporteResponse(listarPorVenta(bCuota, params));
+                case "buscar":
+                    return new ReporteResponse(buscar(bCuota, params));
+                case "listarPorCliente":
+                    return listarPorCliente(bCuota, params);
+                default:
+                    return new ReporteResponse("Comando no implementado: " + command);
             }
         } catch (NumberFormatException e) {
             return new ReporteResponse("Error: Parámetro numérico inválido - " + e.getMessage());
@@ -60,7 +67,12 @@ public class HandleCuota {
                         req.setAmount(0.1); // Test amount
                         req.setCurrency(2); // BOB
                         req.setClientCode(String.valueOf(clienteId));
-                        req.setCallbackUrl("https://webhook.site/callback-test");
+                        req.setCallbackUrl("https://no-hay-url/test");
+
+                        // AGREGADO: Enviar el array orderDetail obligatorio para la API de PagoFacil
+                        List<QrRequest.OrderDetail> detalles = new ArrayList<>();
+                        detalles.add(new QrRequest.OrderDetail(1, "Pago Cuota " + nroCuota, 1, 0.1, 0.0, 0.1));
+                        req.setOrderDetail(detalles);
 
                         QrResponse qrRes = pfService.generarQR(req);
                         if (qrRes != null && qrRes.getError() == 0 && qrRes.getValues() != null) {
@@ -81,12 +93,15 @@ public class HandleCuota {
                     }
                 }
                 if (count > 0) {
-                    response.setTextoRespuesta(resText + "\n\nSe han adjuntado " + count + " código(s) QR para pagar sus cuotas pendientes o en mora.");
+                    response.setTextoRespuesta(resText + "\n\nSe han adjuntado " + count
+                            + " código(s) QR para pagar sus cuotas pendientes o en mora.");
                 } else {
-                    response.setTextoRespuesta(resText + "\n\n(No se pudo adjuntar los códigos QR de PagoFácil por un error en el servicio).");
+                    response.setTextoRespuesta(resText
+                            + "\n\n(No se pudo adjuntar los códigos QR de PagoFácil por un error en el servicio).");
                 }
             } else {
-                response.setTextoRespuesta(resText + "\n\n(Advertencia: Falló la autenticación con PagoFácil, no se generaron QRs).");
+                response.setTextoRespuesta(
+                        resText + "\n\n(Advertencia: Falló la autenticación con PagoFácil, no se generaron QRs).");
             }
         }
 
@@ -96,7 +111,8 @@ public class HandleCuota {
     /** pagar(id, fecha_pago, monto_pagado) */
     private static String pagar(BCuota b, String params) {
         String[] p = params.split(",");
-        if (p.length < 3) return "Error: Uso: pagar(id,fecha_pago,monto_pagado)";
+        if (p.length < 3)
+            return "Error: Uso: pagar(id,fecha_pago,monto_pagado)";
         return b.pagarCuota(Integer.parseInt(p[0].trim()), p[1].trim(),
                 Double.parseDouble(p[2].trim()));
     }
@@ -110,16 +126,17 @@ public class HandleCuota {
     private static String listarPorVenta(BCuota b, String params) {
         int ventaId = Integer.parseInt(params.trim());
         List<String[]> lista = b.listarPorVenta(ventaId);
-        if (lista.isEmpty()) return "No hay cuotas para la venta " + ventaId;
+        if (lista.isEmpty())
+            return "No hay cuotas para la venta " + ventaId;
         StringBuilder sb = new StringBuilder("=== CUOTAS DE VENTA " + ventaId + " ===\n");
         for (String[] c : lista) {
             sb.append("N°").append(c[6])
-              .append(" | ID:").append(c[0])
-              .append(" | Estado:").append(c[1])
-              .append(" | Vence:").append(c[3])
-              .append(" | Pagado:").append(c[5])
-              .append(" | PlanPago:").append(c[7])
-              .append("\n");
+                    .append(" | ID:").append(c[0])
+                    .append(" | Estado:").append(c[1])
+                    .append(" | Vence:").append(c[3])
+                    .append(" | Pagado:").append(c[5])
+                    .append(" | PlanPago:").append(c[7])
+                    .append("\n");
         }
         return sb.toString();
     }
@@ -127,7 +144,8 @@ public class HandleCuota {
     /** buscar(id) */
     private static String buscar(BCuota b, String params) {
         String[] c = b.buscarPorId(Integer.parseInt(params.trim()));
-        if (c == null) return "Cuota no encontrada";
+        if (c == null)
+            return "Cuota no encontrada";
         return "ID: " + c[0] + "\nN° Cuota: " + c[6]
                 + "\nEstado: " + c[1] + "\nFecha pago: " + c[2]
                 + "\nFecha vencimiento: " + c[3] + "\nMonto pagado: " + c[5]

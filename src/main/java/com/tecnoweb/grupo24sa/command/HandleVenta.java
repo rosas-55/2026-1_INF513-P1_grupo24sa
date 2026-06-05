@@ -82,6 +82,11 @@ public class HandleVenta {
                     req.setClientCode(String.valueOf(clienteId));
                     req.setCallbackUrl("https://webhook.site/callback-test");
 
+                    // AGREGADO: Enviar el array orderDetail obligatorio para la API de PagoFacil
+                    List<QrRequest.OrderDetail> detalles = new ArrayList<>();
+                    detalles.add(new QrRequest.OrderDetail(1, "Pago Venta al Contado", 1, 0.1, 0.0, 0.1));
+                    req.setOrderDetail(detalles);
+
                     QrResponse qrRes = pfService.generarQR(req);
                     if (qrRes != null && qrRes.getError() == 0 && qrRes.getValues() != null) {
                         String base64Data = qrRes.getValues().getQrBase64();
