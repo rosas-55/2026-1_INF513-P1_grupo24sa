@@ -67,7 +67,8 @@ public class HandleCuota {
                         req.setAmount(0.1); // Test amount
                         req.setCurrency(2); // BOB
                         req.setClientCode(String.valueOf(clienteId));
-                        req.setCallbackUrl("https://no-hay-url/test");
+                        // Lee la URL desde variable de entorno PAGOFACIL_CALLBACK_URL
+                        req.setCallbackUrl(pfService.getCallbackUrl());
 
                         // AGREGADO: Enviar el array orderDetail obligatorio para la API de PagoFacil
                         List<QrRequest.OrderDetail> detalles = new ArrayList<>();

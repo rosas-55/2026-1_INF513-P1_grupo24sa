@@ -32,8 +32,8 @@ public class ConnectionCore {
                     String emailFrom = email.getFrom();
                     String emailSubject = email.getSubject();
 
-                    // Usar interpretConGraficos para soportar archivos adjuntos
-                    ReporteResponse response = CommandInterpreter.interpretConGraficos(emailSubject);
+                    // Usar interpretConGraficos con emailFrom para validar al remitente
+                    ReporteResponse response = CommandInterpreter.interpretConGraficos(emailSubject, emailFrom);
                     System.out.println(response.getTextoRespuesta());
 
                     // Enviar email con archivos adjuntos si los hay

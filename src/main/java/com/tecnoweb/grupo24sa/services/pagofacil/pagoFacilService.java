@@ -23,6 +23,7 @@ public class pagoFacilService {
     private String accessToken;
     private String tcTokenService;
     private String tcTokenSecret;
+    private String callbackUrl;
 
     public pagoFacilService() {
         this.httpClient = HttpClient.newBuilder()
@@ -39,21 +40,39 @@ public class pagoFacilService {
     private void cargarCredenciales() {
         // 1. Intentar leer desde Variables de Entorno (Prioridad alta - Seguro para producción)
         this.tcTokenService = System.getenv("PAGOFACIL_TOKEN_SERVICE");
-        this.tcTokenSecret = System.getenv("PAGOFACIL_TOKEN_SECRET");
+        this.tcTokenSecret  = System.getenv("PAGOFACIL_TOKEN_SECRET");
+        this.callbackUrl    = System.getenv("PAGOFACIL_CALLBACK_URL");
 
         // 2. Si no están en el entorno, leer desde application.properties
-        if (this.tcTokenService == null || this.tcTokenSecret == null) {
+        if (this.tcTokenService == null || this.tcTokenSecret == null || this.callbackUrl == null) {
             try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
                 Properties prop = new Properties();
                 if (input != null) {
                     prop.load(input);
-                    this.tcTokenService = prop.getProperty("pagofacil.token.service");
-                    this.tcTokenSecret = prop.getProperty("pagofacil.token.secret");
+                    if (this.tcTokenService == null)
+                        this.tcTokenService = prop.getProperty("pagofacil.token.service");
+                    if (this.tcTokenSecret == null)
+                        this.tcTokenSecret  = prop.getProperty("pagofacil.token.secret");
+                    if (this.callbackUrl == null)
+                        this.callbackUrl    = prop.getProperty("pagofacil.callback.url",
+                                             "http://localhost:8080/api/pagofacil/callback");
                 }
             } catch (Exception ex) {
                 System.err.println("Advertencia: No se pudo leer application.properties");
             }
         }
+
+        if (this.callbackUrl == null || this.callbackUrl.trim().isEmpty()) {
+            this.callbackUrl = "http://localhost:8080/api/pagofacil/callback";
+        }
+    }
+
+    /**
+     * Retorna la URL de callback configurada para que los handlers la usen
+     * al generar el QR, sin necesidad de hardcodearla en cada clase.
+     */
+    public String getCallbackUrl() {
+        return this.callbackUrl;
     }
 
     /**
