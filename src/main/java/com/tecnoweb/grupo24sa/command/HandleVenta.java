@@ -4,24 +4,34 @@ import com.tecnoweb.grupo24sa.business.BVenta;
 import com.tecnoweb.grupo24sa.services.pagofacil.pagoFacilService;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrRequest;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrResponse;
+import com.tecnoweb.grupo24sa.utils.ContextoEmail;
 import com.tecnoweb.grupo24sa.utils.ReporteResponse;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
 import java.util.ArrayList;
 
 /**
  * Handler para comandos de la entidad 'venta'
+ *
+ * Cambios respecto a la versión anterior:
+ *  - Firma: execute(command, params, ctx)  — recibe el ContextoEmail del remitente
+ *  - 'fecha'      se asigna automáticamente como LocalDate.now()
+ *  - 'vendedor_id' se obtiene de ctx.getUsuarioId() (el usuario que envió el correo)
+ *
+ * Nuevo formato de 'registrar':
+ *   venta registrar(cliente_id, estado, interes_mora, nro_cuotas, tipo, [prod_id;cantidad], ...)
  */
 public class HandleVenta {
 
-    public static ReporteResponse execute(String command, String params) {
+    public static ReporteResponse execute(String command, String params, ContextoEmail ctx) {
         BVenta bVenta = new BVenta();
         try {
             switch (command) {
-                case "registrar":        return registrar(bVenta, params);
+                case "registrar":        return registrar(bVenta, params, ctx);
                 case "actualizarEstado": return new ReporteResponse(actualizarEstado(bVenta, params));
                 case "eliminar":         return new ReporteResponse(eliminar(bVenta, params));
                 case "listar":           return new ReporteResponse(listar(bVenta));
@@ -36,21 +46,30 @@ public class HandleVenta {
         }
     }
 
-    /** registrar(cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, vendedor_id, [producto_id1;cantidad1], ...) */
-    private static ReporteResponse registrar(BVenta b, String params) {
+    /**
+     * registrar(cliente_id, estado, interes_mora, nro_cuotas, tipo, [prod_id1;cant1], ...)
+     *
+     * - 'fecha'       → auto: LocalDate.now()
+     * - 'vendedor_id' → auto: ID del usuario que envió el correo (ctx.getUsuarioId())
+     */
+    private static ReporteResponse registrar(BVenta b, String params, ContextoEmail ctx) {
         String[] p = params.split(",");
-        if (p.length < 7) return new ReporteResponse("Error: Uso: registrar(cliente_id,estado,fecha,interes_mora,nro_cuotas,tipo,vendedor_id,[producto_id1;cantidad1],...)");
-        
-        int clienteId = Integer.parseInt(p[0].trim());
-        String estado = p[1].trim();
-        String fecha = p[2].trim();
-        double interesMora = Double.parseDouble(p[3].trim());
-        int nroCuotas = Integer.parseInt(p[4].trim());
-        String tipo = p[5].trim().toUpperCase();
-        int vendedorId = Integer.parseInt(p[6].trim());
-        
+        if (p.length < 5) return new ReporteResponse(
+            "Error: Uso: venta registrar(cliente_id,estado,interes_mora,nro_cuotas,tipo,[prod_id;cant],...)\n" +
+            "  Nota: la fecha y el vendedor se asignan automaticamente.");
+
+        int    clienteId  = Integer.parseInt(p[0].trim());
+        String estado     = p[1].trim();
+        double interesMora = Double.parseDouble(p[2].trim());
+        int    nroCuotas  = Integer.parseInt(p[3].trim());
+        String tipo       = p[4].trim().toUpperCase();
+
+        // Auto-asignaciones
+        String fecha     = LocalDate.now().toString();       // fecha del servidor
+        int    vendedorId = ctx.getUsuarioId();              // ID del remitente (vendedor o cliente)
+
         List<String[]> items = new ArrayList<>();
-        for (int i = 7; i < p.length; i++) {
+        for (int i = 5; i < p.length; i++) {
             String itemStr = p[i].trim();
             if (itemStr.startsWith("[") && itemStr.endsWith("]")) {
                 itemStr = itemStr.substring(1, itemStr.length() - 1);
@@ -60,32 +79,36 @@ public class HandleVenta {
                 items.add(new String[]{itemParts[0].trim(), itemParts[1].trim()});
             }
         }
-        
+
         String resDb = b.registrarVenta(clienteId, estado, fecha, interesMora, nroCuotas, tipo, vendedorId, items);
         ReporteResponse response = new ReporteResponse(resDb);
 
         // Si la venta fue exitosa y es al contado, generar el QR de PagoFacil
         if (resDb.startsWith("Venta registrada exitosamente") && tipo.equals("CONTADO")) {
+            String ventaIdStr = resDb.replaceAll(".*ID:\\s*(\\d+).*", "$1");
+            int ventaId = -1;
+            try {
+                ventaId = Integer.parseInt(ventaIdStr);
+            } catch (Exception e) {
+                // ignorar si no se pudo parsear
+            }
+
             pagoFacilService pfService = new pagoFacilService();
             if (pfService.autenticar()) {
                 try {
                     QrRequest req = new QrRequest();
-                    req.setPaymentMethod(34); // as per docs example
+                    req.setPaymentMethod(34);
                     req.setClientName("Cliente " + clienteId);
                     req.setDocumentType(1);
-                    req.setDocumentId("000000"); // Placeholder
-                    req.setPhoneNumber("70000000"); // Placeholder
-                    req.setEmail("correo@ejemplo.com"); // Placeholder
-                    // paymentNumber incluye el ID de venta para identificarla en el callback
-                    String ventaIdStr = resDb.replaceAll(".*ID:\\s*(\\d+).*", "$1");
+                    req.setDocumentId("000000");
+                    req.setPhoneNumber("70000000");
+                    req.setEmail("correo@ejemplo.com");
                     req.setPaymentNumber("VTA-" + ventaIdStr + "-" + System.currentTimeMillis());
-                    req.setAmount(0.1); // Test amount as requested
+                    req.setAmount(0.1); // Monto de prueba (proyecto académico)
                     req.setCurrency(2); // BOB
                     req.setClientCode(String.valueOf(clienteId));
-                    // Lee la URL desde variable de entorno PAGOFACIL_CALLBACK_URL
                     req.setCallbackUrl(pfService.getCallbackUrl());
 
-                    // AGREGADO: Enviar el array orderDetail obligatorio para la API de PagoFacil
                     List<QrRequest.OrderDetail> detalles = new ArrayList<>();
                     detalles.add(new QrRequest.OrderDetail(1, "Pago Venta al Contado", 1, 0.1, 0.0, 0.1));
                     req.setOrderDetail(detalles);
@@ -104,13 +127,21 @@ public class HandleVenta {
                         response.addArchivoAdjunto(qrFile);
                         response.setTextoRespuesta(resDb + "\n\nSe ha adjuntado el código QR de PagoFácil para el pago al contado.");
                     } else {
-                        response.setTextoRespuesta(resDb + "\n\n(Advertencia: No se pudo generar el QR de PagoFácil)");
+                        // FALLO EN GENERAR QR - ROLLBACK
+                        if (ventaId != -1) b.eliminarVenta(ventaId);
+                        String errMsg = (qrRes != null) ? qrRes.getMessage() : "Error desconocido de red";
+                        response.setTextoRespuesta("Error: No se pudo generar el QR de PagoFácil (" + errMsg + ").\nLa venta ha sido cancelada para evitar cobros pendientes.");
                     }
                 } catch (Exception e) {
                     System.err.println("Error generando QR: " + e.getMessage());
+                    // FALLO POR EXCEPCIÓN - ROLLBACK
+                    if (ventaId != -1) b.eliminarVenta(ventaId);
+                    response.setTextoRespuesta("Error: Hubo un fallo interno al conectar con PagoFácil (" + e.getMessage() + ").\nLa venta ha sido cancelada.");
                 }
             } else {
-                response.setTextoRespuesta(resDb + "\n\n(Advertencia: Falló la autenticación con PagoFácil, no se generó QR)");
+                // FALLO DE AUTENTICACIÓN - ROLLBACK
+                if (ventaId != -1) b.eliminarVenta(ventaId);
+                response.setTextoRespuesta("Error: Falló la autenticación con PagoFácil. Verifica las credenciales en .env.\nLa venta ha sido cancelada.");
             }
         }
 

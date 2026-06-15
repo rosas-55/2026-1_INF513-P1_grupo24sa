@@ -4,6 +4,7 @@ import com.tecnoweb.grupo24sa.business.BCuota;
 import com.tecnoweb.grupo24sa.services.pagofacil.pagoFacilService;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrRequest;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrResponse;
+import com.tecnoweb.grupo24sa.utils.ContextoEmail;
 import com.tecnoweb.grupo24sa.utils.ReporteResponse;
 
 import java.io.File;
@@ -14,10 +15,15 @@ import java.util.List;
 
 /**
  * Handler para comandos de la entidad 'cuota'
+ *
+ * Cambios respecto a la versión anterior:
+ *  - Firma: execute(command, params, ctx) — recibe el ContextoEmail del remitente
+ *  - 'listarPorCliente()' sin parámetro: auto-detecta el clienteId desde ctx
+ *  - 'listarPorCliente(id)' con parámetro: usa el ID enviado (para staff)
  */
 public class HandleCuota {
 
-    public static ReporteResponse execute(String command, String params) {
+    public static ReporteResponse execute(String command, String params, ContextoEmail ctx) {
         BCuota bCuota = new BCuota();
         try {
             switch (command) {
@@ -30,7 +36,7 @@ public class HandleCuota {
                 case "buscar":
                     return new ReporteResponse(buscar(bCuota, params));
                 case "listarPorCliente":
-                    return listarPorCliente(bCuota, params);
+                    return listarPorCliente(bCuota, params, ctx);
                 default:
                     return new ReporteResponse("Comando no implementado: " + command);
             }
@@ -41,9 +47,27 @@ public class HandleCuota {
         }
     }
 
-    /** listarPorCliente(cliente_id) */
-    private static ReporteResponse listarPorCliente(BCuota b, String params) {
-        int clienteId = Integer.parseInt(params.trim());
+    /**
+     * listarPorCliente() o listarPorCliente(cliente_id)
+     *
+     * Si params está vacío → usa ctx.getUsuarioId() (el CLIENTE consulta sus propias cuotas)
+     * Si params tiene un ID → usa ese ID (VENDEDOR/PROPIETARIO consulta cuotas de otro cliente)
+     */
+    private static ReporteResponse listarPorCliente(BCuota b, String params, ContextoEmail ctx) {
+        int clienteId;
+
+        if (params.trim().isEmpty()) {
+            // Sin parámetro: auto-detectar desde el contexto del remitente
+            if (ctx == null) {
+                return new ReporteResponse("Error: No se pudo identificar al cliente. Incluye tu ID: listarPorCliente(tu_id)");
+            }
+            clienteId = ctx.getUsuarioId();
+            System.out.println("[HandleCuota] listarPorCliente auto-detectado: clienteId=" + clienteId + " (" + ctx.getEmail() + ")");
+        } else {
+            // Con parámetro: usar el ID enviado explícitamente
+            clienteId = Integer.parseInt(params.trim());
+        }
+
         String resText = b.listarPorCliente(clienteId);
         ReporteResponse response = new ReporteResponse(resText);
 
@@ -54,23 +78,22 @@ public class HandleCuota {
                 int count = 0;
                 for (String[] c : pendientes) {
                     try {
-                        String idCuota = c[0];
+                        String idCuota  = c[0];
                         String nroCuota = c[6];
                         QrRequest req = new QrRequest();
-                        req.setPaymentMethod(34); // Ej. Tigo Money / QR
+                        req.setPaymentMethod(34);
                         req.setClientName("Cliente " + clienteId);
                         req.setDocumentType(1);
                         req.setDocumentId("000000");
                         req.setPhoneNumber("70000000");
                         req.setEmail("correo@ejemplo.com");
                         req.setPaymentNumber("CUOTA-" + idCuota + "-" + System.currentTimeMillis());
-                        req.setAmount(0.1); // Test amount
+                        req.setAmount(0.1); // Monto de prueba (proyecto académico)
                         req.setCurrency(2); // BOB
                         req.setClientCode(String.valueOf(clienteId));
                         // Lee la URL desde variable de entorno PAGOFACIL_CALLBACK_URL
                         req.setCallbackUrl(pfService.getCallbackUrl());
 
-                        // AGREGADO: Enviar el array orderDetail obligatorio para la API de PagoFacil
                         List<QrRequest.OrderDetail> detalles = new ArrayList<>();
                         detalles.add(new QrRequest.OrderDetail(1, "Pago Cuota " + nroCuota, 1, 0.1, 0.0, 0.1));
                         req.setOrderDetail(detalles);
@@ -135,7 +158,7 @@ public class HandleCuota {
                     .append(" | ID:").append(c[0])
                     .append(" | Estado:").append(c[1])
                     .append(" | Vence:").append(c[3])
-                    .append(" | Pagado:").append(c[5])
+                    .append(" | Monto:").append(c[5])
                     .append(" | PlanPago:").append(c[7])
                     .append("\n");
         }
@@ -149,7 +172,7 @@ public class HandleCuota {
             return "Cuota no encontrada";
         return "ID: " + c[0] + "\nN° Cuota: " + c[6]
                 + "\nEstado: " + c[1] + "\nFecha pago: " + c[2]
-                + "\nFecha vencimiento: " + c[3] + "\nMonto pagado: " + c[5]
+                + "\nFecha vencimiento: " + c[3] + "\nMonto: " + c[5]
                 + "\nInterés mora: " + c[4] + "%" + "\nPlan pago: " + c[7]
                 + "\nVentaID: " + c[8];
     }

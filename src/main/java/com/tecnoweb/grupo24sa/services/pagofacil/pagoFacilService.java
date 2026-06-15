@@ -19,7 +19,7 @@ public class pagoFacilService {
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
     private final String baseUrl = "https://masterqr.pagofacil.com.bo/api/services/v2";
-    
+
     private String accessToken;
     private String tcTokenService;
     private String tcTokenSecret;
@@ -34,14 +34,15 @@ public class pagoFacilService {
     }
 
     /**
-     * Carga las credenciales desde variables de entorno (Producción) 
+     * Carga las credenciales desde variables de entorno (Producción)
      * o desde application.properties (Desarrollo local).
      */
     private void cargarCredenciales() {
-        // 1. Intentar leer desde Variables de Entorno (Prioridad alta - Seguro para producción)
+        // 1. Intentar leer desde Variables de Entorno (Prioridad alta - Seguro para
+        // producción)
         this.tcTokenService = System.getenv("PAGOFACIL_TOKEN_SERVICE");
-        this.tcTokenSecret  = System.getenv("PAGOFACIL_TOKEN_SECRET");
-        this.callbackUrl    = System.getenv("PAGOFACIL_CALLBACK_URL");
+        this.tcTokenSecret = System.getenv("PAGOFACIL_TOKEN_SECRET");
+        this.callbackUrl = System.getenv("PAGOFACIL_CALLBACK_URL");
 
         // 2. Si no están en el entorno, leer desde application.properties
         if (this.tcTokenService == null || this.tcTokenSecret == null || this.callbackUrl == null) {
@@ -52,10 +53,10 @@ public class pagoFacilService {
                     if (this.tcTokenService == null)
                         this.tcTokenService = prop.getProperty("pagofacil.token.service");
                     if (this.tcTokenSecret == null)
-                        this.tcTokenSecret  = prop.getProperty("pagofacil.token.secret");
+                        this.tcTokenSecret = prop.getProperty("pagofacil.token.secret");
                     if (this.callbackUrl == null)
-                        this.callbackUrl    = prop.getProperty("pagofacil.callback.url",
-                                             "http://localhost:8080/api/pagofacil/callback");
+                        this.callbackUrl = prop.getProperty("pagofacil.callback.url",
+                                "http://localhost:8080/grupo24sa/pagofacil/callback");
                 }
             } catch (Exception ex) {
                 System.err.println("Advertencia: No se pudo leer application.properties");
