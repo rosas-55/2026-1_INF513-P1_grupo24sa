@@ -5,6 +5,7 @@ import com.tecnoweb.grupo24sa.services.pagofacil.dto.AuthRequest;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.authResponse;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrRequest;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrResponse;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -38,13 +39,22 @@ public class pagoFacilService {
      * o desde application.properties (Desarrollo local).
      */
     private void cargarCredenciales() {
-        // 1. Intentar leer desde Variables de Entorno (Prioridad alta - Seguro para
-        // producción)
-        this.tcTokenService = System.getenv("PAGOFACIL_TOKEN_SERVICE");
-        this.tcTokenSecret = System.getenv("PAGOFACIL_TOKEN_SECRET");
-        this.callbackUrl = System.getenv("PAGOFACIL_CALLBACK_URL");
+        // 1. Intentar cargar desde .env local usando dotenv-java
+        try {
+            Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+            this.tcTokenService = dotenv.get("PAGOFACIL_TOKEN_SERVICE");
+            this.tcTokenSecret  = dotenv.get("PAGOFACIL_TOKEN_SECRET");
+            this.callbackUrl    = dotenv.get("PAGOFACIL_CALLBACK_URL");
+        } catch (Exception e) {
+            System.err.println("Advertencia: No se pudo cargar dotenv");
+        }
 
-        // 2. Si no están en el entorno, leer desde application.properties
+        // 2. Si no se cargó del .env, intentar Variables de Entorno del SO (Producción)
+        if (this.tcTokenService == null) this.tcTokenService = System.getenv("PAGOFACIL_TOKEN_SERVICE");
+        if (this.tcTokenSecret == null)  this.tcTokenSecret  = System.getenv("PAGOFACIL_TOKEN_SECRET");
+        if (this.callbackUrl == null)    this.callbackUrl    = System.getenv("PAGOFACIL_CALLBACK_URL");
+
+        // 3. Si no están en el entorno, leer desde application.properties
         if (this.tcTokenService == null || this.tcTokenSecret == null || this.callbackUrl == null) {
             try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
                 Properties prop = new Properties();
