@@ -19,7 +19,8 @@ import java.util.logging.Logger;
 public class MailVerificationThread implements Runnable {
 
     private final static int PORT_POP = 110;
-    private final static String HOST = "mail.tecnoweb.org.bo";
+    private final static String HOST = System.getenv().getOrDefault(
+            "MAIL_HOST", "mail.tecnoweb.org.bo");
     private final static String USER = "grupo24sa";
     private final static String PASSWORD = "grup024grup024*";
 

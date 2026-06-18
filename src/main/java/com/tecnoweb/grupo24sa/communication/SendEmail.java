@@ -15,6 +15,9 @@ public class SendEmail {
     private final String mail = "grupo24sa@tecnoweb.org.bo";
     private final String username = "grupo24sa";
     private final String password = "grup024grup024*";
+    private final String smtpHost = System.getenv().getOrDefault(
+            "MAIL_HOST", "mail.tecnoweb.org.bo");
+    private final String smtpPort = "25";
 
     public void sendEmail(String to, String response) {
         sendEmail(to, response, null);
@@ -31,8 +34,8 @@ public class SendEmail {
         props.setProperty("mail.smtp.auth", "false");
         // props.put("mail.smtp.starttls.enable", "true");
         props.setProperty("mail.smtp.tls.enable", "true");
-        props.setProperty("mail.smtp.host", "mail.tecnoweb.org.bo");
-        props.setProperty("mail.smtp.port", "25");
+        props.setProperty("mail.smtp.host", smtpHost);
+        props.setProperty("mail.smtp.port", smtpPort);
 
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {
