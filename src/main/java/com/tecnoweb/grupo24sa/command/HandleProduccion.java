@@ -2,6 +2,7 @@ package com.tecnoweb.grupo24sa.command;
 
 import com.tecnoweb.grupo24sa.business.BProduccion;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -28,20 +29,22 @@ public class HandleProduccion {
         }
     }
 
-    /** registrar(cantidad_producida, fecha, receta_id) */
+    /** registrar(cantidad_producida, receta_id) — fecha se asigna automáticamente del servidor */
     private static String registrar(BProduccion b, String params) {
         String[] p = params.split(",");
-        if (p.length < 3) return "Error: Uso: registrar(cantidad_producida,fecha,receta_id)";
+        if (p.length < 2) return "Error: Uso: registrar(cantidad_producida,receta_id)";
+        String fecha = LocalDate.now().toString();
         return b.registrarProduccion(Double.parseDouble(p[0].trim()),
-                p[1].trim(), Integer.parseInt(p[2].trim()));
+                fecha, Integer.parseInt(p[1].trim()));
     }
 
     /** actualizar(id, cantidad_producida, fecha, receta_id) */
     private static String actualizar(BProduccion b, String params) {
         String[] p = params.split(",");
         if (p.length < 4) return "Error: Uso: actualizar(id,cantidad_producida,fecha,receta_id)";
+        String fecha = p[2].trim().isEmpty() ? LocalDate.now().toString() : p[2].trim();
         return b.actualizarProduccion(Integer.parseInt(p[0].trim()),
-                Double.parseDouble(p[1].trim()), p[2].trim(), Integer.parseInt(p[3].trim()));
+                Double.parseDouble(p[1].trim()), fecha, Integer.parseInt(p[3].trim()));
     }
 
     /** eliminar(id) */

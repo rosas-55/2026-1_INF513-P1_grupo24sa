@@ -257,11 +257,11 @@ public class CommandInterpreter {
             "producto buscar(id)\r\n" +
             "\r\n" +
             "=== VENTAS (realizar un pedido) ===\r\n" +
-            "venta registrar(cliente_id,estado,interes_mora,nro_cuotas,tipo,[producto_id;cantidad],...)\r\n" +
+            "venta registrar(nro_cuotas,tipo,[producto_id;cantidad],...)\r\n" +
             "  tipo: CONTADO (pago unico) o CREDITO (>= 2 cuotas mensuales)\r\n" +
-            "  Nota: la fecha y el vendedor se asignan automaticamente.\r\n" +
-            "  Ejemplo contado:  venta registrar(3,PENDIENTE,0.0,1,CONTADO,[1;2])\r\n" +
-            "  Ejemplo credito:  venta registrar(3,PENDIENTE,5.0,3,CREDITO,[1;1],[2;2])\r\n" +
+            "  Nota: cliente_id, estado, interes_mora, fecha y vendedor se asignan automaticamente.\r\n" +
+            "  Ejemplo contado:  venta registrar(1,CONTADO,[1;2])\r\n" +
+            "  Ejemplo credito:  venta registrar(3,CREDITO,[1;1],[2;2])\r\n" +
             "venta listarPorCliente(tu_id)\r\n" +
             "venta buscar(id)\r\n" +
             "\r\n" +
@@ -324,10 +324,10 @@ public class CommandInterpreter {
             "listar() | buscar(id) | listarPorProveedor(proveedor_id)\r\n" +
             "\r\n" +
             "=== VENTA ===\r\n" +
-            "registrar(cliente_id,estado,interes_mora,nro_cuotas,tipo,[producto_id1;cantidad1],...)\r\n" +
+            "registrar(nro_cuotas,tipo,[producto_id1;cantidad1],...)\r\n" +
             "  tipo: CONTADO (1 cuota) o CREDITO (>= 2 cuotas)\r\n" +
-            "  Nota: la fecha y el vendedor_id se asignan automaticamente desde tu correo.\r\n" +
-            "  Ejemplo: venta registrar(3,PENDIENTE,0.0,1,CONTADO,[1;2],[2;1])\r\n" +
+            "  Nota: cliente_id, estado, interes_mora, fecha y vendedor se asignan automaticamente desde tu correo.\r\n" +
+            "  Ejemplo: venta registrar(1,CONTADO,[1;2],[2;1])\r\n" +
             "actualizarEstado(id,estado) | eliminar(id)\r\n" +
             "listar() | buscar(id) | listarPorCliente(cliente_id)\r\n" +
             "\r\n" +

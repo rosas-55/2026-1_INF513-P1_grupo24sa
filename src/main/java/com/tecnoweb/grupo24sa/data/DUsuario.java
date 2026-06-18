@@ -161,7 +161,9 @@ public class DUsuario {
         try {
             System.out.println("DUsuario.findOneById SQL: " + query + " params: id=" + id);
             java.sql.Connection conn = databaseConection.openConnection();
-            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            if (conn == null) {
+                throw new java.sql.SQLException("No se pudo conectar a la base de datos. Verifica que el servidor esté en ejecución.");
+            }
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -177,8 +179,9 @@ public class DUsuario {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DUsuario.findOneById: " + e.getMessage());
+            // Propagar como RuntimeException para que el negocio sepa que es error de conexión
+            throw new RuntimeException("Error de conexión a la base de datos: " + e.getMessage());
         }
     }
 

@@ -49,7 +49,7 @@ public class BProduccion {
             return "Error: La receta con ID " + recetaId + " no existe";
         }
         if (fecha == null || fecha.trim().isEmpty()) {
-            return "Error: La fecha de producción es obligatoria";
+            fecha = java.time.LocalDate.now().toString();
         }
 
         // Verificar stock suficiente para todos los insumos de la receta
@@ -83,6 +83,7 @@ public class BProduccion {
         }
 
         // Incrementar el stock del producto terminado en la tabla Producto
+        StringBuilder logStock = new StringBuilder();
         String[] receta = dReceta.findOneById(recetaId);
         if (receta != null) {
             int productoId = Integer.parseInt(receta[2]);
@@ -90,7 +91,12 @@ public class BProduccion {
             if (prod != null) {
                 int stockActualProd = (prod.length > 4 && prod[4] != null) ? Integer.parseInt(prod[4]) : 0;
                 int nuevoStockProd = stockActualProd + (int) cantidadProducida;
-                dProducto.updateStock(productoId, nuevoStockProd);
+                String updResult = dProducto.updateStock(productoId, nuevoStockProd);
+                logStock.append(" | Producto ID ").append(productoId)
+                        .append(": ").append(stockActualProd).append(" → ").append(nuevoStockProd)
+                        .append(" (").append(updResult).append(")");
+            } else {
+                logStock.append(" | Producto no encontrado para receta ID ").append(recetaId);
             }
         }
 
@@ -117,7 +123,7 @@ public class BProduccion {
                     insumo[4], nuevoStock, stockMinimo, insumo[7]);
         }
 
-        return resultado + " | Insumos descontados y stock del producto incrementado correctamente";
+        return resultado + " | Insumos descontados y stock actualizado." + logStock.toString();
     }
 
     /**

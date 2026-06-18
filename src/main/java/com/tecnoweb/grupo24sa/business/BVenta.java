@@ -80,13 +80,13 @@ public class BVenta {
             return "Error: Para venta CREDITO el número de cuotas debe ser >= 2";
         }
         if (interesMora < 0) {
-            return "Error: El interés de mora no puede ser negativo";
+            interesMora = 0.0;
         }
         if (estado == null || estado.trim().isEmpty()) {
-            return "Error: El estado de la venta es obligatorio";
+            estado = "PENDIENTE";
         }
         if (fecha == null || fecha.trim().isEmpty()) {
-            return "Error: La fecha de la venta es obligatoria";
+            fecha = LocalDate.now().toString();
         }
 
         double calculatedTotal = 0.0;

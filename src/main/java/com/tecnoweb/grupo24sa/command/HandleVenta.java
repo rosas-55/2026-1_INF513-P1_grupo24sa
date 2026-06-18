@@ -47,29 +47,33 @@ public class HandleVenta {
     }
 
     /**
-     * registrar(cliente_id, estado, interes_mora, nro_cuotas, tipo, [prod_id1;cant1], ...)
+     * registrar(nro_cuotas, tipo, [prod_id1;cant1], ...)
      *
+     * - 'cliente_id'  → auto: ID del remitente (ctx.getUsuarioId())
+     * - 'estado'      → auto: "PENDIENTE"
+     * - 'interes_mora'→ auto: 0.0
      * - 'fecha'       → auto: LocalDate.now()
      * - 'vendedor_id' → auto: ID del usuario que envió el correo (ctx.getUsuarioId())
      */
     private static ReporteResponse registrar(BVenta b, String params, ContextoEmail ctx) {
         String[] p = params.split(",");
-        if (p.length < 5) return new ReporteResponse(
-            "Error: Uso: venta registrar(cliente_id,estado,interes_mora,nro_cuotas,tipo,[prod_id;cant],...)\n" +
-            "  Nota: la fecha y el vendedor se asignan automaticamente.");
-
-        int    clienteId  = Integer.parseInt(p[0].trim());
-        String estado     = p[1].trim();
-        double interesMora = Double.parseDouble(p[2].trim());
-        int    nroCuotas  = Integer.parseInt(p[3].trim());
-        String tipo       = p[4].trim().toUpperCase();
+        if (p.length < 2) return new ReporteResponse(
+            "Error: Uso: venta registrar(nro_cuotas,tipo,[prod_id;cant],...)\n" +
+            "  Nota: cliente_id, estado, interes_mora, fecha y vendedor se asignan automaticamente.\n" +
+            "  Ejemplo: venta registrar(1,CONTADO,[1;2])\n" +
+            "  Ejemplo: venta registrar(3,CREDITO,[1;1],[2;2])");
 
         // Auto-asignaciones
-        String fecha     = LocalDate.now().toString();       // fecha del servidor
-        int    vendedorId = ctx.getUsuarioId();              // ID del remitente (vendedor o cliente)
+        int    clienteId   = ctx.getUsuarioId();             // ID del remitente (cliente o vendedor)
+        String estado      = "PENDIENTE";                    // estado por defecto
+        double interesMora = 0.0;                            // interés por defecto
+        int    nroCuotas   = Integer.parseInt(p[0].trim());
+        String tipo        = p[1].trim().toUpperCase();
+        String fecha       = LocalDate.now().toString();      // fecha del servidor
+        int    vendedorId  = ctx.getUsuarioId();              // ID del remitente
 
         List<String[]> items = new ArrayList<>();
-        for (int i = 5; i < p.length; i++) {
+        for (int i = 2; i < p.length; i++) {
             String itemStr = p[i].trim();
             if (itemStr.startsWith("[") && itemStr.endsWith("]")) {
                 itemStr = itemStr.substring(1, itemStr.length() - 1);
