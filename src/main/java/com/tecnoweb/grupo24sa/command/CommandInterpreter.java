@@ -93,7 +93,19 @@ public class CommandInterpreter {
         System.out.println("Email remitente: " + emailFrom);
 
         // ── 1. Resolver contexto del remitente ──────────────────────────────────
-        ContextoEmail ctx = resolverContexto(emailFrom);
+        ContextoEmail ctx;
+        try {
+            ctx = resolverContexto(emailFrom);
+        } catch (RuntimeException e) {
+            System.err.println("[CommandInterpreter] Error de conexión a BD: " + e.getMessage());
+            return new ReporteResponse(
+                "⚠ Error del Sistema ⚠\n\n" +
+                "No se pudo conectar a la base de datos.\n" +
+                "El servicio no está disponible en este momento.\n\n" +
+                "Por favor, intenta de nuevo más tarde.\n\n" +
+                "Detalle técnico: " + e.getMessage()
+            );
+        }
 
         // ── 2. Comando HELP — diferenciado por rol ──────────────────────────────
         if (subject.equalsIgnoreCase("help")) {
@@ -198,17 +210,13 @@ public class CommandInterpreter {
     /**
      * Busca al usuario en la BD por su email y construye un ContextoEmail.
      * Retorna null si el email está vacío o no se encuentra en la BD.
+     * Lanza RuntimeException si hay un error de conexión a la BD.
      */
     private static ContextoEmail resolverContexto(String emailFrom) {
         if (emailFrom == null || emailFrom.trim().isEmpty()) return null;
-        try {
-            DUsuario dUsuario = new DUsuario();
-            String[] usuario = dUsuario.findByEmail(emailFrom.trim().toLowerCase());
-            return ContextoEmail.desde(usuario); // retorna null si usuario == null
-        } catch (Exception e) {
-            System.err.println("[CommandInterpreter] Error al resolver contexto del correo: " + e.getMessage());
-            return null;
-        }
+        DUsuario dUsuario = new DUsuario();
+        String[] usuario = dUsuario.findByEmail(emailFrom.trim().toLowerCase());
+        return ContextoEmail.desde(usuario); // retorna null si usuario == null
     }
 
     // ── Mensajes de ayuda ────────────────────────────────────────────────────
