@@ -16,10 +16,14 @@ import java.util.List;
 /**
  * Handler para comandos de la entidad 'cuota'
  *
- * Cambios respecto a la versión anterior:
- *  - Firma: execute(command, params, ctx) — recibe el ContextoEmail del remitente
- *  - 'listarPorCliente()' sin parámetro: auto-detecta el clienteId desde ctx
- *  - 'listarPorCliente(id)' con parámetro: usa el ID enviado (para staff)
+ * Comportamiento por comando:
+ *   listarPorCliente()       → CLIENTE ve sus cuotas (auto-detecta ID del ctx)
+ *   listarPorCliente(id)     → PROPIETARIO/VENDEDOR ve cuotas de un cliente
+ *   pagar(id_cuota)          → CLIENTE: genera QR para pagar UNA cuota específica
+ *   pagar(id,fecha,monto)    → PROPIETARIO/VENDEDOR: registra pago manualmente
+ *   eliminar(id)             → Elimina cuota
+ *   listarPorVenta(venta_id) → Lista cuotas de una venta
+ *   buscar(id)               → Busca cuota por ID
  */
 public class HandleCuota {
 
@@ -28,7 +32,7 @@ public class HandleCuota {
         try {
             switch (command) {
                 case "pagar":
-                    return new ReporteResponse(pagar(bCuota, params));
+                    return pagar(bCuota, params, ctx);
                 case "eliminar":
                     return new ReporteResponse(eliminar(bCuota, params));
                 case "listarPorVenta":
@@ -50,95 +54,127 @@ public class HandleCuota {
     /**
      * listarPorCliente() o listarPorCliente(cliente_id)
      *
-     * Si params está vacío → usa ctx.getUsuarioId() (el CLIENTE consulta sus propias cuotas)
-     * Si params tiene un ID → usa ese ID (VENDEDOR/PROPIETARIO consulta cuotas de otro cliente)
+     * Sin params → usa ctx.getUsuarioId() (el CLIENTE ve sus propias cuotas)
+     * Con params → usa ese ID (VENDEDOR/PROPIETARIO consulta cuotas de otro cliente)
+     * Solo muestra datos, NO genera QR.
      */
     private static ReporteResponse listarPorCliente(BCuota b, String params, ContextoEmail ctx) {
         int clienteId;
 
         if (params.trim().isEmpty()) {
-            // Sin parámetro: auto-detectar desde el contexto del remitente
             if (ctx == null) {
-                return new ReporteResponse("Error: No se pudo identificar al cliente. Incluye tu ID: listarPorCliente(tu_id)");
+                return new ReporteResponse("Error: No se pudo identificar al cliente. Usa: listarPorCliente(tu_id)");
             }
             clienteId = ctx.getUsuarioId();
-            System.out.println("[HandleCuota] listarPorCliente auto-detectado: clienteId=" + clienteId + " (" + ctx.getEmail() + ")");
         } else {
-            // Con parámetro: usar el ID enviado explícitamente
             clienteId = Integer.parseInt(params.trim());
         }
 
         String resText = b.listarPorCliente(clienteId);
-        ReporteResponse response = new ReporteResponse(resText);
-
-        List<String[]> pendientes = b.obtenerCuotasPendientes(clienteId);
-        if (!pendientes.isEmpty()) {
-            pagoFacilService pfService = new pagoFacilService();
-            if (pfService.autenticar()) {
-                int count = 0;
-                for (String[] c : pendientes) {
-                    try {
-                        String idCuota  = c[0];
-                        String nroCuota = c[6];
-                        QrRequest req = new QrRequest();
-                        req.setPaymentMethod(34);
-                        req.setClientName("Cliente " + clienteId);
-                        req.setDocumentType(1);
-                        req.setDocumentId("000000");
-                        req.setPhoneNumber("70000000");
-                        req.setEmail("correo@ejemplo.com");
-                        req.setPaymentNumber("CUOTA-" + idCuota + "-" + System.currentTimeMillis());
-                        req.setAmount(0.1); // Monto de prueba (proyecto académico)
-                        req.setCurrency(2); // BOB
-                        req.setClientCode(String.valueOf(clienteId));
-                        // Lee la URL desde variable de entorno PAGOFACIL_CALLBACK_URL
-                        req.setCallbackUrl(pfService.getCallbackUrl());
-
-                        List<QrRequest.OrderDetail> detalles = new ArrayList<>();
-                        detalles.add(new QrRequest.OrderDetail(1, "Pago Cuota " + nroCuota, 1, 0.1, 0.0, 0.1));
-                        req.setOrderDetail(detalles);
-
-                        QrResponse qrRes = pfService.generarQR(req);
-                        if (qrRes != null && qrRes.getError() == 0 && qrRes.getValues() != null) {
-                            String base64Data = qrRes.getValues().getQrBase64();
-                            if (base64Data.startsWith("data:image/png;base64,")) {
-                                base64Data = base64Data.substring(22);
-                            }
-                            byte[] imageBytes = Base64.getDecoder().decode(base64Data);
-                            File qrFile = new File("qr_cuota_" + nroCuota + "_" + System.currentTimeMillis() + ".png");
-                            try (FileOutputStream fos = new FileOutputStream(qrFile)) {
-                                fos.write(imageBytes);
-                            }
-                            response.addArchivoAdjunto(qrFile);
-                            count++;
-                        }
-                    } catch (Exception e) {
-                        System.err.println("Error generando QR para cuota: " + e.getMessage());
-                    }
-                }
-                if (count > 0) {
-                    response.setTextoRespuesta(resText + "\n\nSe han adjuntado " + count
-                            + " código(s) QR para pagar sus cuotas pendientes o en mora.");
-                } else {
-                    response.setTextoRespuesta(resText
-                            + "\n\n(No se pudo adjuntar los códigos QR de PagoFácil por un error en el servicio).");
-                }
-            } else {
-                response.setTextoRespuesta(
-                        resText + "\n\n(Advertencia: Falló la autenticación con PagoFácil, no se generaron QRs).");
-            }
-        }
-
-        return response;
+        return new ReporteResponse(resText);
     }
 
-    /** pagar(id, fecha_pago, monto_pagado) */
-    private static String pagar(BCuota b, String params) {
+    /**
+     * pagar(id_cuota)  → 1 param:  genera QR de PagoFácil para ESA cuota (CLIENTE)
+     * pagar(id, fecha_pago, monto_pagado) → 3 params: pago manual (PROPIETARIO/VENDEDOR)
+     */
+    private static ReporteResponse pagar(BCuota b, String params, ContextoEmail ctx) {
         String[] p = params.split(",");
-        if (p.length < 3)
-            return "Error: Uso: pagar(id,fecha_pago,monto_pagado)";
-        return b.pagarCuota(Integer.parseInt(p[0].trim()), p[1].trim(),
-                Double.parseDouble(p[2].trim()));
+        
+        if (p.length == 1) {
+            // ── QR para UNA cuota ──────────────────────────────────────
+            int cuotaId = Integer.parseInt(p[0].trim());
+            return generarQRPagoCuota(b, cuotaId, ctx);
+
+        } else if (p.length >= 3) {
+            // ── Pago manual (solo PROPIETARIO o VENDEDOR) ──────────────
+            if (ctx == null || ctx.esCliente()) {
+                return new ReporteResponse(
+                    "Error: Solo el propietario o un vendedor pueden registrar pagos manualmente.\n" +
+                    "Como cliente, usa: cuota pagar(id_cuota) para obtener un QR de pago.");
+            }
+            String resultado = b.pagarCuota(
+                Integer.parseInt(p[0].trim()),
+                p[1].trim(),
+                Double.parseDouble(p[2].trim())
+            );
+            return new ReporteResponse(resultado);
+
+        } else {
+            return new ReporteResponse(
+                "Error: Uso:\n" +
+                "  cuota pagar(id_cuota)               → genera QR para pagar ESA cuota\n" +
+                "  cuota pagar(id,fecha_pago,monto)     → (propietario) registra pago manual");
+        }
+    }
+
+    /**
+     * Genera un QR de PagoFácil para una cuota específica.
+     */
+    private static ReporteResponse generarQRPagoCuota(BCuota b, int cuotaId, ContextoEmail ctx) {
+        String[] cuota = b.buscarPorId(cuotaId);
+        if (cuota == null) {
+            return new ReporteResponse("Error: Cuota no encontrada con ID: " + cuotaId);
+        }
+
+        String estado = cuota[1];
+        if (!estado.equalsIgnoreCase("PENDIENTE") && !estado.equalsIgnoreCase("EN_MORA")) {
+            return new ReporteResponse("La cuota " + cuotaId + " ya está en estado: " + estado + ". No requiere pago.");
+        }
+
+        int clienteId = ctx != null ? ctx.getUsuarioId() : 0;
+        String nroCuota = cuota[6];
+        double monto = Double.parseDouble(cuota[5]);
+
+        pagoFacilService pfService = new pagoFacilService();
+        if (!pfService.autenticar()) {
+            return new ReporteResponse("Error: Falló la autenticación con PagoFácil. Verifica las credenciales.");
+        }
+
+        try {
+            QrRequest req = new QrRequest();
+            req.setPaymentMethod(34);
+            req.setClientName("Cliente " + clienteId);
+            req.setDocumentType(1);
+            req.setDocumentId("000000");
+            req.setPhoneNumber("70000000");
+            req.setEmail("correo@ejemplo.com");
+            req.setPaymentNumber("CUOTA-" + cuotaId + "-" + System.currentTimeMillis());
+            req.setAmount(monto);
+            req.setCurrency(2); // BOB
+            req.setClientCode(String.valueOf(clienteId));
+            req.setCallbackUrl(pfService.getCallbackUrl());
+
+            List<QrRequest.OrderDetail> detalles = new ArrayList<>();
+            detalles.add(new QrRequest.OrderDetail(1, "Pago Cuota N°" + nroCuota + " (ID " + cuotaId + ")", 1, monto, 0.0, monto));
+            req.setOrderDetail(detalles);
+
+            QrResponse qrRes = pfService.generarQR(req);
+            if (qrRes != null && qrRes.getError() == 0 && qrRes.getValues() != null) {
+                String base64Data = qrRes.getValues().getQrBase64();
+                if (base64Data.startsWith("data:image/png;base64,")) {
+                    base64Data = base64Data.substring(22);
+                }
+                byte[] imageBytes = Base64.getDecoder().decode(base64Data);
+                File qrFile = new File("qr_cuota_" + cuotaId + "_" + System.currentTimeMillis() + ".png");
+                try (FileOutputStream fos = new FileOutputStream(qrFile)) {
+                    fos.write(imageBytes);
+                }
+                ReporteResponse response = new ReporteResponse(
+                    "QR generado para Cuota N°" + nroCuota + " (ID " + cuotaId + ")\n" +
+                    "Monto: Bs. " + String.format("%.2f", monto) + "\n" +
+                    "Escanea el código QR adjunto para pagar."
+                );
+                response.addArchivoAdjunto(qrFile);
+                return response;
+            } else {
+                String errMsg = (qrRes != null) ? qrRes.getMessage() : "Error desconocido de red";
+                return new ReporteResponse("Error: No se pudo generar el QR de PagoFácil: " + errMsg);
+            }
+        } catch (Exception e) {
+            System.err.println("Error generando QR para cuota " + cuotaId + ": " + e.getMessage());
+            return new ReporteResponse("Error: Fallo al conectar con PagoFácil: " + e.getMessage());
+        }
     }
 
     /** eliminar(id) */

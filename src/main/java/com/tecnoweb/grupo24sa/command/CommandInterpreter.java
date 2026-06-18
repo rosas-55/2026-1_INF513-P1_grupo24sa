@@ -281,8 +281,8 @@ public class CommandInterpreter {
             "venta buscar(id)\r\n" +
             "\r\n" +
             "=== CUOTAS (gestionar tus pagos pendientes) ===\r\n" +
-            "cuota listarPorCliente()     <- ver cuotas; recibes QR de pago automaticamente\r\n" +
-            "cuota pagar(id,fecha_pago,monto_pagado)\r\n" +
+            "cuota listarPorCliente()     <- ver tus cuotas y estado de cada una\r\n" +
+            "cuota pagar(id_cuota)        <- genera un QR para pagar ESA cuota especifica\r\n" +
             "cuota listarPorVenta(venta_id)\r\n" +
             "cuota buscar(id)\r\n" +
             "\r\n" +
@@ -347,10 +347,11 @@ public class CommandInterpreter {
             "listar() | buscar(id) | listarPorCliente(cliente_id)\r\n" +
             "\r\n" +
             "=== CUOTA ===\r\n" +
-            "pagar(id,fecha_pago,monto_pagado)   <- detecta mora automaticamente\r\n" +
+            "pagar(id,fecha_pago,monto_pagado)   <- pago manual (propietario/vendedor)\r\n" +
+            "pagar(id_cuota)                     <- genera QR para ESA cuota\r\n" +
             "eliminar(id) | listarPorVenta(venta_id) | buscar(id)\r\n" +
-            "listarPorCliente()      <- muestra mora si existe; genera QR de pago\r\n" +
-            "listarPorCliente(cliente_id)   <- para consultar cuotas de otro cliente\r\n" +
+            "listarPorCliente()      <- tus cuotas (cliente)\r\n" +
+            "listarPorCliente(cliente_id)   <- cuotas de otro cliente (staff)\r\n" +
             "\r\n" +
             "=== INVENTARIO ===\r\n" +
             "registrar(cantidad,insumo_id,costo_unitario,observacion,tipo_movimiento)\r\n" +

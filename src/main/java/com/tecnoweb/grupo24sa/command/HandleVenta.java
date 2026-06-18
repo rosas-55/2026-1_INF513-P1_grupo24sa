@@ -51,7 +51,7 @@ public class HandleVenta {
      *
      * - 'cliente_id'  → auto: ID del remitente (ctx.getUsuarioId())
      * - 'estado'      → auto: "PENDIENTE"
-     * - 'interes_mora'→ auto: 0.0
+     * - 'interes_mora'→ auto: 30 (30% interés anual por mora)
      * - 'fecha'       → auto: LocalDate.now()
      * - 'vendedor_id' → auto: ID del usuario que envió el correo (ctx.getUsuarioId())
      */
@@ -66,7 +66,7 @@ public class HandleVenta {
         // Auto-asignaciones
         int    clienteId   = ctx.getUsuarioId();             // ID del remitente (cliente o vendedor)
         String estado      = "PENDIENTE";                    // estado por defecto
-        double interesMora = 0.0;                            // interés por defecto
+        double interesMora = 30.0;                           // 30% interés anual por mora
         int    nroCuotas   = Integer.parseInt(p[0].trim());
         String tipo        = p[1].trim().toUpperCase();
         String fecha       = LocalDate.now().toString();      // fecha del servidor

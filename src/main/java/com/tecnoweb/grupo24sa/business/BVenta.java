@@ -80,7 +80,7 @@ public class BVenta {
             return "Error: Para venta CREDITO el número de cuotas debe ser >= 2";
         }
         if (interesMora < 0) {
-            interesMora = 0.0;
+            interesMora = 30.0;
         }
         if (estado == null || estado.trim().isEmpty()) {
             estado = "PENDIENTE";

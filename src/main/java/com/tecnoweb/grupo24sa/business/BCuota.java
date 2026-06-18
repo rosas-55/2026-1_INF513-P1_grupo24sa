@@ -65,7 +65,9 @@ public class BCuota {
                     LocalDate fechaVenc = LocalDate.parse(fechaVencimientoStr);
                     if (hoy.isAfter(fechaVenc)) {
                         long diasAtrasados = ChronoUnit.DAYS.between(fechaVenc, hoy);
-                        double penalizacion = montoPagado * (interesMora / 365.0) * diasAtrasados;
+                        // interesMora = porcentaje anual (ej: 30 = 30% anual)
+                        // Fórmula: monto * (tasa_anual/100/365) * días_atraso
+                        double penalizacion = montoPagado * (interesMora / 100.0 / 365.0) * diasAtrasados;
                         double totalAPagar = montoPagado + penalizacion;
 
                         sb.append("\n  -> ¡ATRASADO! CuotaMensual = ").append(String.format("%.2f", montoPagado))
