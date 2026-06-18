@@ -1,5 +1,7 @@
 package com.tecnoweb.grupo24sa.ConfigDB;
 
+import com.tecnoweb.grupo24sa.utils.EnvConfig;
+
 public class ConfigDB {
     private final String user;
     private final String password;
@@ -9,20 +11,10 @@ public class ConfigDB {
 
     public ConfigDB() {
         this.user = "grupo24sa";
-//        this.user = "postgres";
-
         this.password = "grup024grup024*";
-//        this.password = "ejzr1203";
-
-        this.host = "mail.tecnoweb.org.bo";
-//        this.host = "127.0.0.1";
-
-//        this.port = "5432";
+        this.host = EnvConfig.get("MAIL_HOST", "mail.tecnoweb.org.bo");
         this.port = "5432";
-
         this.dbName = "db_grupo24sa";
-//        this.dbName = "tecnodb";
-
     }
 
     public String getUser() {
