@@ -13,7 +13,7 @@ import java.util.Properties;
 
 public class ImapIdleThread implements Runnable {
 
-    private final static String HOST = System.getenv().getOrDefault(
+    private final static String HOST = com.tecnoweb.grupo24sa.utils.EnvConfig.get(
             "MAIL_HOST", "mail.tecnoweb.org.bo");
     private final static String USER = "grupo24sa";
     private final static String PASSWORD = "grup024grup024*";

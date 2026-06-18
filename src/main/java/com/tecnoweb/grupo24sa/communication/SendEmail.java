@@ -15,7 +15,7 @@ public class SendEmail {
     private final String mail = "grupo24sa@tecnoweb.org.bo";
     private final String username = "grupo24sa";
     private final String password = "grup024grup024*";
-    private final String smtpHost = System.getenv().getOrDefault(
+    private final String smtpHost = com.tecnoweb.grupo24sa.utils.EnvConfig.get(
             "MAIL_HOST", "mail.tecnoweb.org.bo");
     private final String smtpPort = "25";
 

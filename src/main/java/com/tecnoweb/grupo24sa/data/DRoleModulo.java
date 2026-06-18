@@ -1,4 +1,4 @@
-﻿package com.tecnoweb.grupo24sa.data;
+package com.tecnoweb.grupo24sa.data;
 
 import com.tecnoweb.grupo24sa.ConfigDB.ConfigDB;
 import com.tecnoweb.grupo24sa.ConfigDB.DatabaseConection;
