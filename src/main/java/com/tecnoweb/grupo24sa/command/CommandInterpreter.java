@@ -108,14 +108,18 @@ public class CommandInterpreter {
         }
 
         // ── 2. Comando HELP — diferenciado por rol ──────────────────────────────
-        if (subject.equalsIgnoreCase("help")) {
+        // Normalizar acentos para comparación case/accent-insensitive
+        String normalizedSubject = java.text.Normalizer.normalize(subject, java.text.Normalizer.Form.NFD)
+                .replaceAll("[\\p{M}]", "");
+        if (normalizedSubject.equalsIgnoreCase("help")) {
             if (ctx == null)           return new ReporteResponse(getHelpNoRegistrado(emailFrom));
             if (ctx.esCliente())       return new ReporteResponse(getHelpCliente(ctx.getNombre()));
             return new ReporteResponse(getHelpCompleto());
         }
 
         // ── 3. Parsear la estructura del comando ────────────────────────────────
-        String pattern = "([a-zA-Z]+)\\s+([a-zA-Z]+)\\s*\\((.*)\\)";
+        //      [\\p{L}] acepta letras con acentos (á, é, ñ, ü, etc.)
+        String pattern = "([\\p{L}]+)\\s+([\\p{L}]+)\\s*\\((.*)\\)";
         java.util.regex.Pattern regex = java.util.regex.Pattern.compile(pattern);
         java.util.regex.Matcher matcher = regex.matcher(subject);
 
@@ -125,9 +129,12 @@ public class CommandInterpreter {
                     "Envía 'help' para ver los comandos disponibles.");
         }
 
-        String entity       = matcher.group(1).trim().toLowerCase();
-        String commandInput = matcher.group(2).trim();
-        String params       = matcher.group(3).trim();
+        // Normalizar acentos y lowercase para comparación case/accent-insensitive
+        String entity       = java.text.Normalizer.normalize(matcher.group(1).trim(), java.text.Normalizer.Form.NFD)
+                                .replaceAll("[\\p{M}]", "").toLowerCase();
+        String commandInput = java.text.Normalizer.normalize(matcher.group(2).trim(), java.text.Normalizer.Form.NFD)
+                                .replaceAll("[\\p{M}]", "").toLowerCase();
+        String params       = matcher.group(3).trim();  // preserva acentos en parámetros (nombres, direcciones)
 
         if (!COMMANDS.containsKey(entity)) {
             return new ReporteResponse(
