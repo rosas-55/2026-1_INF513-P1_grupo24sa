@@ -91,7 +91,7 @@ public class BVenta {
 
         double calculatedTotal = 0.0;
 
-        // Validar todos los productos y cantidades, y calcular el total de la venta
+        // Validar todos los productos: existencia, cantidad > 0, y stock suficiente
         for (String[] item : items) {
             try {
                 int prodId = Integer.parseInt(item[0]);
@@ -107,6 +107,18 @@ public class BVenta {
                 if (cantidad <= 0) {
                     return "Error: La cantidad del producto " + prodId + " debe ser mayor a 0";
                 }
+
+                // ── Validar stock suficiente ──────────────────────────
+                int stockActual = (prod.length > 4 && prod[4] != null)
+                        ? Integer.parseInt(prod[4]) : 0;
+                if (cantidad > stockActual) {
+                    return "Error: Stock insuficiente.\n" +
+                           "  Producto: " + prod[2] + " (ID " + prodId + ")\n" +
+                           "  Stock disponible: " + stockActual + "\n" +
+                           "  Cantidad solicitada: " + cantidad + "\n" +
+                           "  La venta ha sido cancelada.";
+                }
+
                 double precioVenta = Double.parseDouble(prod[3]);
                 calculatedTotal += cantidad * precioVenta;
             } catch (NumberFormatException e) {
