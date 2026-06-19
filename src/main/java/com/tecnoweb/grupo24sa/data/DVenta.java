@@ -81,7 +81,7 @@ public class DVenta {
      * Actualizar el pagofacilTransactionId de una venta
      */
     public String updatePagoFacilTransactionId(int id, long pagofacilTransactionId) {
-        String query = "UPDATE VENTA SET pagofacil_transaction_id = ? WHERE id = ?";
+        String query = "UPDATE VENTA SET pagofaciltransactionid = ? WHERE id = ?";
         try {
             java.sql.Connection conn = databaseConection.openConnection();
             if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
@@ -143,7 +143,7 @@ public class DVenta {
      * Listar todas las ventas
      */
     public List<String[]> findAll() {
-        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofacil_transaction_id FROM VENTA ORDER BY fecha DESC";
+        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofaciltransactionid FROM VENTA ORDER BY fecha DESC";
         List<String[]> ventas = new ArrayList<>();
         try {
             java.sql.Connection conn = databaseConection.openConnection();
@@ -162,7 +162,7 @@ public class DVenta {
                 venta[6] = rs.getString("tipo");
                 venta[7] = String.valueOf(rs.getDouble("total"));
                 venta[8] = String.valueOf(rs.getInt("vendedor_id"));
-                venta[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
+                venta[9] = rs.getObject("pagofaciltransactionid") != null ? String.valueOf(rs.getLong("pagofaciltransactionid")) : null;
                 ventas.add(venta);
             }
 
@@ -180,7 +180,7 @@ public class DVenta {
      * Buscar venta por ID
      */
     public String[] findOneById(int id) {
-        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofacil_transaction_id FROM VENTA WHERE id = ?";
+        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofaciltransactionid FROM VENTA WHERE id = ?";
         try {
             java.sql.Connection conn = databaseConection.openConnection();
             if (conn == null) return null;
@@ -199,7 +199,7 @@ public class DVenta {
                 venta[6] = rs.getString("tipo");
                 venta[7] = String.valueOf(rs.getDouble("total"));
                 venta[8] = String.valueOf(rs.getInt("vendedor_id"));
-                venta[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
+                venta[9] = rs.getObject("pagofaciltransactionid") != null ? String.valueOf(rs.getLong("pagofaciltransactionid")) : null;
 
                 rs.close();
                 ps.close();
@@ -219,7 +219,7 @@ public class DVenta {
      * Listar ventas por cliente
      */
     public List<String[]> findByCliente(int clienteId) {
-        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofacil_transaction_id FROM VENTA WHERE cliente_id = ? ORDER BY fecha DESC";
+        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofaciltransactionid FROM VENTA WHERE cliente_id = ? ORDER BY fecha DESC";
         List<String[]> ventas = new ArrayList<>();
         try {
             java.sql.Connection conn = databaseConection.openConnection();
@@ -239,7 +239,7 @@ public class DVenta {
                 venta[6] = rs.getString("tipo");
                 venta[7] = String.valueOf(rs.getDouble("total"));
                 venta[8] = String.valueOf(rs.getInt("vendedor_id"));
-                venta[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
+                venta[9] = rs.getObject("pagofaciltransactionid") != null ? String.valueOf(rs.getLong("pagofaciltransactionid")) : null;
                 ventas.add(venta);
             }
 
