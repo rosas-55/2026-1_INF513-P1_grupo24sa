@@ -48,7 +48,8 @@ public class DRoleModulo {
 
             return result > 0 ? "MÃ³dulo asignado al rol exitosamente" : "Error: No se pudo asignar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -68,7 +69,8 @@ public class DRoleModulo {
 
             return result > 0 ? "MÃ³dulo revocado del rol exitosamente" : "Error: No se pudo revocar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

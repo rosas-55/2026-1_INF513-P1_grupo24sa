@@ -55,7 +55,8 @@ public class DInsumo {
 
             return result > 0 ? "Insumo creado exitosamente" : "Error: No se pudo crear el insumo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -83,7 +84,8 @@ public class DInsumo {
 
             return result > 0 ? "Insumo actualizado exitosamente" : "Error: No se pudo actualizar el insumo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -102,7 +104,8 @@ public class DInsumo {
 
             return result > 0 ? "Insumo eliminado exitosamente" : "Error: No se pudo eliminar el insumo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

@@ -47,7 +47,8 @@ public class DRole {
 
             return result > 0 ? "Rol creado exitosamente" : "Error: No se pudo crear el rol";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -68,7 +69,8 @@ public class DRole {
 
             return result > 0 ? "Rol actualizado exitosamente" : "Error: No se pudo actualizar el rol";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -87,7 +89,8 @@ public class DRole {
 
             return result > 0 ? "Rol eliminado exitosamente" : "Error: No se pudo eliminar el rol";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

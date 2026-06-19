@@ -51,7 +51,8 @@ public class DAccion {
 
             return result > 0 ? "AcciÃ³n creada exitosamente" : "Error: No se pudo crear la acciÃ³n";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -74,7 +75,8 @@ public class DAccion {
 
             return result > 0 ? "AcciÃ³n actualizada exitosamente" : "Error: No se pudo actualizar la acciÃ³n";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -93,7 +95,8 @@ public class DAccion {
 
             return result > 0 ? "AcciÃ³n eliminada exitosamente" : "Error: No se pudo eliminar la acciÃ³n";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

@@ -78,7 +78,8 @@ public class DCompra {
 
             return result > 0 ? "Compra actualizada exitosamente" : "Error: No se pudo actualizar la compra";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -97,7 +98,8 @@ public class DCompra {
 
             return result > 0 ? "Compra eliminada exitosamente" : "Error: No se pudo eliminar la compra";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

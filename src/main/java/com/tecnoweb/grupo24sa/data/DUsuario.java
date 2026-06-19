@@ -50,7 +50,8 @@ public class DUsuario {
 
             return result > 0 ? "Usuario creado exitosamente" : "Error: No se pudo crear el usuario";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -79,7 +80,8 @@ public class DUsuario {
 
             return result > 0 ? "Usuario actualizado exitosamente" : "Error: No se pudo actualizar el usuario";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -102,7 +104,8 @@ public class DUsuario {
 
             return result > 0 ? "Usuario eliminado exitosamente" : "Error: No se pudo eliminar el usuario";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -138,7 +141,9 @@ public class DUsuario {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexi�n a la base de datos: " + e.getMessage());`n        }
+            System.err.println("Error en DUsuario: " + e.getMessage());
+        throw new RuntimeException("Error de conexi�n a la base de datos: " + e.getMessage());
+        }
 
         return usuarios;
     }
@@ -209,7 +214,9 @@ public class DUsuario {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexi�n a la base de datos: " + e.getMessage());`n        }
+            System.err.println("Error en DUsuario: " + e.getMessage());
+        throw new RuntimeException("Error de conexi�n a la base de datos: " + e.getMessage());
+        }
 
         return usuarios;
     }

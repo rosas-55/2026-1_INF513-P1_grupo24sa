@@ -48,7 +48,8 @@ public class DRecetaInsumo {
 
             return result > 0 ? "Insumo asociado a receta exitosamente" : "Error: No se pudo asociar el insumo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -69,7 +70,8 @@ public class DRecetaInsumo {
 
             return result > 0 ? "RecetaInsumo actualizado exitosamente" : "Error: No se pudo actualizar";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -89,7 +91,8 @@ public class DRecetaInsumo {
 
             return result > 0 ? "Insumo removido de receta exitosamente" : "Error: No se pudo remover el insumo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

@@ -94,7 +94,8 @@ public class DVenta {
 
             return result > 0 ? "Venta actualizada exitosamente" : "Error: No se pudo actualizar la venta";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -113,7 +114,8 @@ public class DVenta {
 
             return result > 0 ? "Venta eliminada exitosamente" : "Error: No se pudo eliminar la venta";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

@@ -52,7 +52,8 @@ public class DModulo {
 
             return result > 0 ? "MÃ³dulo creado exitosamente" : "Error: No se pudo crear el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -76,7 +77,8 @@ public class DModulo {
 
             return result > 0 ? "MÃ³dulo actualizado exitosamente" : "Error: No se pudo actualizar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -95,7 +97,8 @@ public class DModulo {
 
             return result > 0 ? "MÃ³dulo eliminado exitosamente" : "Error: No se pudo eliminar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

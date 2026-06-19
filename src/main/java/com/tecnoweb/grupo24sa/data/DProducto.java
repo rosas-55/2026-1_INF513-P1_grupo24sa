@@ -54,7 +54,8 @@ public class DProducto {
 
             return result > 0 ? "Producto creado exitosamente" : "Error: No se pudo crear el producto";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -82,7 +83,8 @@ public class DProducto {
 
             return result > 0 ? "Producto actualizado exitosamente" : "Error: No se pudo actualizar el producto";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -102,7 +104,8 @@ public class DProducto {
 
             return result > 0 ? "Stock de producto actualizado" : "Error: No se pudo actualizar el stock del producto";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -121,7 +124,8 @@ public class DProducto {
 
             return result > 0 ? "Producto eliminado exitosamente" : "Error: No se pudo eliminar el producto";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

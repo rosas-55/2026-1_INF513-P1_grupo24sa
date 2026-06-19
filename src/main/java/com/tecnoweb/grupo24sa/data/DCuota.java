@@ -62,7 +62,8 @@ public class DCuota {
 
             return result > 0 ? "Cuota creada exitosamente" : "Error: No se pudo crear la cuota";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -88,7 +89,8 @@ public class DCuota {
 
             return result > 0 ? "Cuota actualizada exitosamente" : "Error: No se pudo actualizar la cuota";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -107,7 +109,8 @@ public class DCuota {
 
             return result > 0 ? "Cuota eliminada exitosamente" : "Error: No se pudo eliminar la cuota";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

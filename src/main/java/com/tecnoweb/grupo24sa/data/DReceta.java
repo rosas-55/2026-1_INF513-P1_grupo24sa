@@ -79,7 +79,8 @@ public class DReceta {
 
             return result > 0 ? "Receta actualizada exitosamente" : "Error: No se pudo actualizar la receta";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -98,7 +99,8 @@ public class DReceta {
 
             return result > 0 ? "Receta eliminada exitosamente" : "Error: No se pudo eliminar la receta";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

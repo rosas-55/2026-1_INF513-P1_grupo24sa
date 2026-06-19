@@ -49,7 +49,8 @@ public class DProveedor {
 
             return result > 0 ? "Proveedor creado exitosamente" : "Error: No se pudo crear el proveedor";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -72,7 +73,8 @@ public class DProveedor {
 
             return result > 0 ? "Proveedor actualizado exitosamente" : "Error: No se pudo actualizar el proveedor";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -92,7 +94,8 @@ public class DProveedor {
 
             return result > 0 ? "Proveedor eliminado exitosamente" : "Error: No se pudo eliminar el proveedor";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

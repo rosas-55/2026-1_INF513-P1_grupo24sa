@@ -55,7 +55,8 @@ public class DInventario {
 
             return result > 0 ? "Movimiento de inventario registrado exitosamente" : "Error: No se pudo registrar el movimiento";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -76,7 +77,8 @@ public class DInventario {
 
             return result > 0 ? "Inventario actualizado exitosamente" : "Error: No se pudo actualizar el inventario";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -95,7 +97,8 @@ public class DInventario {
 
             return result > 0 ? "Registro eliminado exitosamente" : "Error: No se pudo eliminar el registro";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

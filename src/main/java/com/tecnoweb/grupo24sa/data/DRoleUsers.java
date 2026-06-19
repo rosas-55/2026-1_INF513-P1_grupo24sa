@@ -47,7 +47,8 @@ public class DRoleUsers {
 
             return result > 0 ? "Rol asignado a usuario exitosamente" : "Error: No se pudo asignar el rol";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -67,7 +68,8 @@ public class DRoleUsers {
 
             return result > 0 ? "Rol revocado exitosamente" : "Error: No se pudo revocar el rol";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**

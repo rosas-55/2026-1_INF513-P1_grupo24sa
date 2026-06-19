@@ -50,7 +50,8 @@ public class DDetalleVenta {
 
             return result > 0 ? "Detalle de venta creado exitosamente" : "Error: No se pudo crear el detalle de venta";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -73,7 +74,8 @@ public class DDetalleVenta {
 
             return result > 0 ? "Detalle actualizado exitosamente" : "Error: No se pudo actualizar el detalle";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
@@ -92,7 +94,8 @@ public class DDetalleVenta {
 
             return result > 0 ? "Detalle eliminado exitosamente" : "Error: No se pudo eliminar el detalle";
         } catch (SQLException e) {
-            return "Error de BD: " + e.getMessage();`n        }
+            return "Error de BD: " + e.getMessage();
+        }
     }
 
     /**
