@@ -141,8 +141,7 @@ public class DUsuario {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexi髇 a la base de datos: " + e.getMessage());`n        }
 
         return usuarios;
     }
@@ -213,8 +212,7 @@ public class DUsuario {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexi髇 a la base de datos: " + e.getMessage());`n        }
 
         return usuarios;
     }
@@ -249,8 +247,8 @@ public class DUsuario {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DUsuario.findByCedula: " + e.getMessage());
+            throw new RuntimeException("Error de conexi贸n a la base de datos: " + e.getMessage());
         }
     }
 
@@ -285,8 +283,8 @@ public class DUsuario {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DUsuario.authenticateUser: " + e.getMessage());
+            throw new RuntimeException("Error de conexi贸n a la base de datos: " + e.getMessage());
         }
     }
 
@@ -304,7 +302,9 @@ public class DUsuario {
         try {
             System.out.println("DUsuario.findByEmail SQL: " + query + " params: email=" + email);
             java.sql.Connection conn = databaseConection.openConnection();
-            if (conn == null) throw new java.sql.SQLException("No se pudo obtener la conexion a la base de datos");
+            if (conn == null) {
+                throw new java.sql.SQLException("No se pudo conectar a la base de datos. Verifica que el servidor est茅 en ejecuci贸n.");
+            }
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
@@ -320,8 +320,8 @@ public class DUsuario {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DUsuario.findByEmail: " + e.getMessage());
+            throw new RuntimeException("Error de conexi贸n a la base de datos: " + e.getMessage());
         }
     }
 
