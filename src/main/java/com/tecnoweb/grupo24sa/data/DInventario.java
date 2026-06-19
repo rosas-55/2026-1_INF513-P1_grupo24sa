@@ -55,8 +55,7 @@ public class DInventario {
 
             return result > 0 ? "Movimiento de inventario registrado exitosamente" : "Error: No se pudo registrar el movimiento";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -77,8 +76,7 @@ public class DInventario {
 
             return result > 0 ? "Inventario actualizado exitosamente" : "Error: No se pudo actualizar el inventario";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -97,8 +95,7 @@ public class DInventario {
 
             return result > 0 ? "Registro eliminado exitosamente" : "Error: No se pudo eliminar el registro";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -131,7 +128,8 @@ public class DInventario {
             ps.close();
             System.out.println("Total movimientos de inventario: " + registros.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DInventario: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return registros;
     }
@@ -169,8 +167,8 @@ public class DInventario {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DInventario: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -204,7 +202,8 @@ public class DInventario {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DInventario: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return registros;
     }

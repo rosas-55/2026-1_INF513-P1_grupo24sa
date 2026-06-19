@@ -51,8 +51,7 @@ public class DAccion {
 
             return result > 0 ? "AcciÃ³n creada exitosamente" : "Error: No se pudo crear la acciÃ³n";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -75,8 +74,7 @@ public class DAccion {
 
             return result > 0 ? "AcciÃ³n actualizada exitosamente" : "Error: No se pudo actualizar la acciÃ³n";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -95,8 +93,7 @@ public class DAccion {
 
             return result > 0 ? "AcciÃ³n eliminada exitosamente" : "Error: No se pudo eliminar la acciÃ³n";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -125,7 +122,8 @@ public class DAccion {
             ps.close();
             System.out.println("Total acciones: " + acciones.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DAccion: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return acciones;
     }
@@ -159,8 +157,8 @@ public class DAccion {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DAccion: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 }

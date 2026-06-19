@@ -50,8 +50,7 @@ public class DUsuario {
 
             return result > 0 ? "Usuario creado exitosamente" : "Error: No se pudo crear el usuario";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -80,8 +79,7 @@ public class DUsuario {
 
             return result > 0 ? "Usuario actualizado exitosamente" : "Error: No se pudo actualizar el usuario";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -104,8 +102,7 @@ public class DUsuario {
 
             return result > 0 ? "Usuario eliminado exitosamente" : "Error: No se pudo eliminar el usuario";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -141,7 +138,7 @@ public class DUsuario {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexión a la base de datos: " + e.getMessage());`n        }
+            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexiï¿½n a la base de datos: " + e.getMessage());`n        }
 
         return usuarios;
     }
@@ -212,7 +209,7 @@ public class DUsuario {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexión a la base de datos: " + e.getMessage());`n        }
+            System.err.println("Error en DUsuario: " + e.getMessage());`n        throw new RuntimeException("Error de conexiï¿½n a la base de datos: " + e.getMessage());`n        }
 
         return usuarios;
     }

@@ -47,8 +47,7 @@ public class DRoleUsers {
 
             return result > 0 ? "Rol asignado a usuario exitosamente" : "Error: No se pudo asignar el rol";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -68,8 +67,7 @@ public class DRoleUsers {
 
             return result > 0 ? "Rol revocado exitosamente" : "Error: No se pudo revocar el rol";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -97,7 +95,8 @@ public class DRoleUsers {
             ps.close();
             System.out.println("Roles del usuario " + userId + ": " + items.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DRoleUsers: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return items;
     }
@@ -125,7 +124,8 @@ public class DRoleUsers {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DRoleUsers: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return items;
     }

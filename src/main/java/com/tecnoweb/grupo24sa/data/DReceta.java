@@ -79,8 +79,7 @@ public class DReceta {
 
             return result > 0 ? "Receta actualizada exitosamente" : "Error: No se pudo actualizar la receta";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -99,8 +98,7 @@ public class DReceta {
 
             return result > 0 ? "Receta eliminada exitosamente" : "Error: No se pudo eliminar la receta";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -128,7 +126,8 @@ public class DReceta {
             ps.close();
             System.out.println("Total recetas: " + recetas.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DReceta: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return recetas;
     }
@@ -161,8 +160,8 @@ public class DReceta {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DReceta: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -191,7 +190,8 @@ public class DReceta {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DReceta: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return recetas;
     }

@@ -50,8 +50,7 @@ public class DDetalleCompra {
 
             return result > 0 ? "Detalle de compra creado exitosamente" : "Error: No se pudo crear el detalle de compra";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -73,8 +72,7 @@ public class DDetalleCompra {
 
             return result > 0 ? "Detalle actualizado exitosamente" : "Error: No se pudo actualizar el detalle";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -93,8 +91,7 @@ public class DDetalleCompra {
 
             return result > 0 ? "Detalle eliminado exitosamente" : "Error: No se pudo eliminar el detalle";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -125,7 +122,8 @@ public class DDetalleCompra {
             ps.close();
             System.out.println("Total detalles de compra " + compraId + ": " + detalles.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DDetalleCompra: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return detalles;
     }
@@ -160,8 +158,8 @@ public class DDetalleCompra {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DDetalleCompra: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 }

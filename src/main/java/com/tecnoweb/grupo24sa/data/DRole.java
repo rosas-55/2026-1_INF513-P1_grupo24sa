@@ -47,8 +47,7 @@ public class DRole {
 
             return result > 0 ? "Rol creado exitosamente" : "Error: No se pudo crear el rol";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -69,8 +68,7 @@ public class DRole {
 
             return result > 0 ? "Rol actualizado exitosamente" : "Error: No se pudo actualizar el rol";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -89,8 +87,7 @@ public class DRole {
 
             return result > 0 ? "Rol eliminado exitosamente" : "Error: No se pudo eliminar el rol";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -117,7 +114,8 @@ public class DRole {
             ps.close();
             System.out.println("Total roles: " + roles.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DRole: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return roles;
     }
@@ -149,8 +147,8 @@ public class DRole {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DRole: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -181,8 +179,8 @@ public class DRole {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DRole: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 }

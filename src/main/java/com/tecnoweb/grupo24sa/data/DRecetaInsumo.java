@@ -48,8 +48,7 @@ public class DRecetaInsumo {
 
             return result > 0 ? "Insumo asociado a receta exitosamente" : "Error: No se pudo asociar el insumo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -70,8 +69,7 @@ public class DRecetaInsumo {
 
             return result > 0 ? "RecetaInsumo actualizado exitosamente" : "Error: No se pudo actualizar";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -91,8 +89,7 @@ public class DRecetaInsumo {
 
             return result > 0 ? "Insumo removido de receta exitosamente" : "Error: No se pudo remover el insumo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -122,7 +119,8 @@ public class DRecetaInsumo {
             ps.close();
             System.out.println("Insumos de receta " + recetaId + ": " + items.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DRecetaInsumo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return items;
     }

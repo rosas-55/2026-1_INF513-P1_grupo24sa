@@ -62,8 +62,7 @@ public class DCuota {
 
             return result > 0 ? "Cuota creada exitosamente" : "Error: No se pudo crear la cuota";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -89,8 +88,7 @@ public class DCuota {
 
             return result > 0 ? "Cuota actualizada exitosamente" : "Error: No se pudo actualizar la cuota";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -109,8 +107,7 @@ public class DCuota {
 
             return result > 0 ? "Cuota eliminada exitosamente" : "Error: No se pudo eliminar la cuota";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -145,7 +142,8 @@ public class DCuota {
             ps.close();
             System.out.println("Total cuotas de venta " + ventaId + ": " + cuotas.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DCuota: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return cuotas;
     }
@@ -181,7 +179,8 @@ public class DCuota {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DCuota: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return cuotas;
     }
@@ -220,8 +219,8 @@ public class DCuota {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DCuota: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 }

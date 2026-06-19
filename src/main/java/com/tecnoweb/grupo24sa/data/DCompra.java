@@ -78,8 +78,7 @@ public class DCompra {
 
             return result > 0 ? "Compra actualizada exitosamente" : "Error: No se pudo actualizar la compra";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -98,8 +97,7 @@ public class DCompra {
 
             return result > 0 ? "Compra eliminada exitosamente" : "Error: No se pudo eliminar la compra";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -128,7 +126,8 @@ public class DCompra {
             ps.close();
             System.out.println("Total compras: " + compras.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DCompra: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return compras;
     }
@@ -162,8 +161,8 @@ public class DCompra {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DCompra: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -193,7 +192,8 @@ public class DCompra {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DCompra: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return compras;
     }

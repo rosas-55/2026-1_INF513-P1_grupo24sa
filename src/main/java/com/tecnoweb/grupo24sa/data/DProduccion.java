@@ -48,8 +48,7 @@ public class DProduccion {
 
             return result > 0 ? "ProducciÃ³n registrada exitosamente" : "Error: No se pudo registrar la producciÃ³n";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -71,8 +70,7 @@ public class DProduccion {
 
             return result > 0 ? "ProducciÃ³n actualizada exitosamente" : "Error: No se pudo actualizar la producciÃ³n";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -91,8 +89,7 @@ public class DProduccion {
 
             return result > 0 ? "ProducciÃ³n eliminada exitosamente" : "Error: No se pudo eliminar la producciÃ³n";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -120,7 +117,8 @@ public class DProduccion {
             ps.close();
             System.out.println("Total registros de producciÃ³n: " + producciones.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DProduccion: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return producciones;
     }
@@ -153,8 +151,8 @@ public class DProduccion {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DProduccion: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -183,7 +181,8 @@ public class DProduccion {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DProduccion: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return producciones;
     }

@@ -48,8 +48,7 @@ public class DRoleModulo {
 
             return result > 0 ? "MÃ³dulo asignado al rol exitosamente" : "Error: No se pudo asignar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -69,8 +68,7 @@ public class DRoleModulo {
 
             return result > 0 ? "MÃ³dulo revocado del rol exitosamente" : "Error: No se pudo revocar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -99,7 +97,8 @@ public class DRoleModulo {
             ps.close();
             System.out.println("MÃ³dulos del rol " + roleId + ": " + items.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DRoleModulo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return items;
     }
@@ -127,7 +126,8 @@ public class DRoleModulo {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DRoleModulo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return items;
     }

@@ -55,8 +55,7 @@ public class DInsumo {
 
             return result > 0 ? "Insumo creado exitosamente" : "Error: No se pudo crear el insumo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -84,8 +83,7 @@ public class DInsumo {
 
             return result > 0 ? "Insumo actualizado exitosamente" : "Error: No se pudo actualizar el insumo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -104,8 +102,7 @@ public class DInsumo {
 
             return result > 0 ? "Insumo eliminado exitosamente" : "Error: No se pudo eliminar el insumo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -137,7 +134,8 @@ public class DInsumo {
             ps.close();
             System.out.println("Total insumos: " + insumos.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DInsumo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return insumos;
     }
@@ -174,8 +172,8 @@ public class DInsumo {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DInsumo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -211,8 +209,8 @@ public class DInsumo {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DInsumo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -242,7 +240,8 @@ public class DInsumo {
             ps.close();
             System.out.println("Insumos bajo stock mÃ­nimo: " + insumos.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DInsumo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return insumos;
     }

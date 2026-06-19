@@ -52,8 +52,7 @@ public class DModulo {
 
             return result > 0 ? "MÃ³dulo creado exitosamente" : "Error: No se pudo crear el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -77,8 +76,7 @@ public class DModulo {
 
             return result > 0 ? "MÃ³dulo actualizado exitosamente" : "Error: No se pudo actualizar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -97,8 +95,7 @@ public class DModulo {
 
             return result > 0 ? "MÃ³dulo eliminado exitosamente" : "Error: No se pudo eliminar el mÃ³dulo";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -128,7 +125,8 @@ public class DModulo {
             ps.close();
             System.out.println("Total mÃ³dulos: " + modulos.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DModulo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return modulos;
     }
@@ -163,8 +161,8 @@ public class DModulo {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DModulo: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 }

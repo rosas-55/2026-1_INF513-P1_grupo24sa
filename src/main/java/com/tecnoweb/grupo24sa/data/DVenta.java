@@ -94,8 +94,7 @@ public class DVenta {
 
             return result > 0 ? "Venta actualizada exitosamente" : "Error: No se pudo actualizar la venta";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -114,8 +113,7 @@ public class DVenta {
 
             return result > 0 ? "Venta eliminada exitosamente" : "Error: No se pudo eliminar la venta";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -148,7 +146,8 @@ public class DVenta {
             ps.close();
             System.out.println("Total ventas: " + ventas.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DVenta: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return ventas;
     }
@@ -186,8 +185,8 @@ public class DVenta {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DVenta: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -221,7 +220,8 @@ public class DVenta {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DVenta: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return ventas;
     }

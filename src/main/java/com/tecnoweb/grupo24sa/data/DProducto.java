@@ -54,8 +54,7 @@ public class DProducto {
 
             return result > 0 ? "Producto creado exitosamente" : "Error: No se pudo crear el producto";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -83,8 +82,7 @@ public class DProducto {
 
             return result > 0 ? "Producto actualizado exitosamente" : "Error: No se pudo actualizar el producto";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -104,8 +102,7 @@ public class DProducto {
 
             return result > 0 ? "Stock de producto actualizado" : "Error: No se pudo actualizar el stock del producto";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -124,8 +121,7 @@ public class DProducto {
 
             return result > 0 ? "Producto eliminado exitosamente" : "Error: No se pudo eliminar el producto";
         } catch (SQLException e) {
-            return "Error: " + e.getMessage();
-        }
+            return "Error de BD: " + e.getMessage();`n        }
     }
 
     /**
@@ -156,7 +152,8 @@ public class DProducto {
             ps.close();
             System.out.println("Total productos: " + productos.size());
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error en DProducto: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
         return productos;
     }
@@ -192,8 +189,8 @@ public class DProducto {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DProducto: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 
@@ -228,8 +225,8 @@ public class DProducto {
             ps.close();
             return null;
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Error en DProducto: " + e.getMessage());
+            throw new RuntimeException("Error de conexion a la base de datos: " + e.getMessage());
         }
     }
 }
