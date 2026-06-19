@@ -41,6 +41,8 @@ public class HandleCuota {
                     return new ReporteResponse(buscar(bCuota, params));
                 case "listarPorCliente":
                     return listarPorCliente(bCuota, params, ctx);
+                case "verificarPago":
+                    return new ReporteResponse(verificarPago(bCuota, params));
                 default:
                     return new ReporteResponse("Comando no implementado: " + command);
             }
@@ -151,6 +153,10 @@ public class HandleCuota {
 
             QrResponse qrRes = pfService.generarQR(req);
             if (qrRes != null && qrRes.getError() == 0 && qrRes.getValues() != null) {
+                // Guardar el transactionId de PagoFácil en la cuota
+                long transactionId = qrRes.getValues().getTransactionId();
+                b.actualizarPagoFacilTransactionId(cuotaId, transactionId);
+
                 String base64Data = qrRes.getValues().getQrBase64();
                 if (base64Data.startsWith("data:image/png;base64,")) {
                     base64Data = base64Data.substring(22);
@@ -163,6 +169,7 @@ public class HandleCuota {
                 ReporteResponse response = new ReporteResponse(
                     "QR generado para Cuota N°" + nroCuota + " (ID " + cuotaId + ")\n" +
                     "Monto: Bs. " + String.format("%.2f", monto) + "\n" +
+                    "Transaction ID: " + transactionId + "\n" +
                     "Escanea el código QR adjunto para pagar."
                 );
                 response.addArchivoAdjunto(qrFile);
@@ -211,5 +218,10 @@ public class HandleCuota {
                 + "\nFecha vencimiento: " + c[3] + "\nMonto: " + c[5]
                 + "\nInterés mora: " + c[4] + "%" + "\nPlan pago: " + c[7]
                 + "\nVentaID: " + c[8];
+    }
+
+    /** verificarPago(id_cuota) */
+    private static String verificarPago(BCuota b, String params) {
+        return b.verificarPago(Integer.parseInt(params.trim()));
     }
 }

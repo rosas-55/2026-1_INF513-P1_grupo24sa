@@ -18,13 +18,13 @@ public class CommandInterpreter {
 
         // CU2 - Gestión de Ventas
         COMMANDS.put("venta",
-                new String[] { "registrar", "actualizarEstado", "eliminar", "listar", "buscar", "listarPorCliente" });
+                new String[] { "registrar", "actualizarEstado", "eliminar", "listar", "buscar", "listarPorCliente", "verificarPago" });
 
         // CU3 - Gestión de Productos
         COMMANDS.put("producto", new String[] { "registrar", "actualizar", "eliminar", "listar", "buscar" });
 
         // CU5 - Gestión de Cuotas
-        COMMANDS.put("cuota", new String[] { "pagar", "eliminar", "listarPorVenta", "buscar", "listarPorCliente" });
+        COMMANDS.put("cuota", new String[] { "pagar", "eliminar", "listarPorVenta", "buscar", "listarPorCliente", "verificarPago" });
 
         // CU6 - Gestión de Insumos
         COMMANDS.put("insumo",
@@ -268,27 +268,86 @@ public class CommandInterpreter {
             "Formato: escribe el comando en el ASUNTO del correo.\r\n" +
             "\r\n" +
             "=== PRODUCTOS (ver el menú del restaurante) ===\r\n" +
-            "producto listar()\r\n" +
-            "producto buscar(id)\r\n" +
+            "producto listar()                    <- Ver todos los productos disponibles\r\n" +
+            "producto buscar(id)                  <- Ver detalle de un producto específico\r\n" +
+            "  Ejemplo: producto buscar(1)\r\n" +
             "\r\n" +
             "=== VENTAS (realizar un pedido) ===\r\n" +
             "venta registrar(nro_cuotas,tipo,[producto_id;cantidad],...)\r\n" +
-            "  tipo: CONTADO (pago unico) o CREDITO (>= 2 cuotas mensuales)\r\n" +
-            "  Nota: cliente_id, estado, interes_mora, fecha y vendedor se asignan automaticamente.\r\n" +
+            "  tipo: CONTADO (pago único inmediato) o CREDITO (2+ cuotas mensuales)\r\n" +
+            "  Nota: tu ID de cliente, fecha y vendedor se asignan automáticamente\r\n" +
             "  Ejemplo contado:  venta registrar(1,CONTADO,[1;2])\r\n" +
-            "  Ejemplo credito:  venta registrar(3,CREDITO,[1;1],[2;2])\r\n" +
-            "venta listarPorCliente(tu_id)\r\n" +
-            "venta buscar(id)\r\n" +
+            "                      (2 unidades del producto 1, pago inmediato)\r\n" +
+            "  Ejemplo crédito:  venta registrar(3,CREDITO,[1;1],[2;2])\r\n" +
+            "                      (1 prod1 + 2 prod2, pagado en 3 cuotas)\r\n" +
+            "venta listarPorCliente(tu_id)        <- Ver todas tus ventas\r\n" +
+            "  Ejemplo: venta listarPorCliente(5)\r\n" +
+            "venta buscar(id)                     <- Ver detalle de una venta\r\n" +
+            "  Ejemplo: venta buscar(10)\r\n" +
+            "venta verificarPago(id_venta)        <- Verificar si un QR de venta fue pagado\r\n" +
+            "  Ejemplo: venta verificarPago(10)\r\n" +
             "\r\n" +
             "=== CUOTAS (gestionar tus pagos pendientes) ===\r\n" +
-            "cuota listarPorCliente()     <- ver tus cuotas y estado de cada una\r\n" +
-            "cuota pagar(id_cuota)        <- genera un QR para pagar ESA cuota especifica\r\n" +
-            "cuota listarPorVenta(venta_id)\r\n" +
-            "cuota buscar(id)\r\n" +
+            "cuota listarPorCliente()             <- Ver TODAS tus cuotas y su estado\r\n" +
+            "cuota pagar(id_cuota)                <- Generar QR para pagar ESA cuota específica\r\n" +
+            "  Ejemplo: cuota pagar(25)\r\n" +
+            "  → Recibirás un código QR adjunto para escanear y pagar\r\n" +
+            "cuota verificarPago(id_cuota)        <- Verificar si un QR de cuota fue pagado\r\n" +
+            "  Ejemplo: cuota verificarPago(25)\r\n" +
+            "cuota listarPorVenta(venta_id)       <- Ver cuotas de una venta específica\r\n" +
+            "  Ejemplo: cuota listarPorVenta(10)\r\n" +
+            "cuota buscar(id)                     <- Ver detalle de una cuota\r\n" +
+            "  Ejemplo: cuota buscar(25)\r\n" +
             "\r\n" +
             "=== CUENTA ===\r\n" +
             "usuario cambiarPassword(id,password_actual,password_nueva)\r\n" +
-            "usuario buscar(id)\r\n";
+            "  Ejemplo: usuario cambiarPassword(5,mipass123,nuevapass456)\r\n" +
+            "usuario buscar(id)                   <- Ver tus datos de perfil\r\n" +
+            "  Ejemplo: usuario buscar(5)\r\n" +
+            "\r\n" +
+            "═══════════════════════════════════════════════════════════════\r\n" +
+            "FLUJO COMPLETO PARA CLIENTE - Desde registro hasta pago:\r\n" +
+            "═══════════════════════════════════════════════════════════════\r\n" +
+            "\r\n" +
+            "PASO 1: REGISTRARTE COMO CLIENTE\r\n" +
+            "  Asunto: usuario registrar(Tu Nombre,12345678,70000001,Calle 1 #123,tucorreo@gmail.com,mipass123,CLIENTE)\r\n" +
+            "  → Recibirás confirmación con tu ID de cliente (ej: ID 5)\r\n" +
+            "\r\n" +
+            "PASO 2: VER EL MENÚ DE PRODUCTOS\r\n" +
+            "  Asunto: producto listar()\r\n" +
+            "  → Recibirás lista de productos con IDs y precios\r\n" +
+            "\r\n" +
+            "PASO 3A: REALIZAR VENTA AL CONTADO (pago inmediato con QR)\r\n" +
+            "  Asunto: venta registrar(1,CONTADO,[1;2],[3;1])\r\n" +
+            "  → Compra 2 unidades del producto 1 y 1 del producto 3\r\n" +
+            "  → Recibirás: Confirmación de venta + QR de PagoFácil adjunto\r\n" +
+            "  → Escanea el QR con tu app bancaria y paga\r\n" +
+            "  → Para verificar si se registró el pago:\r\n" +
+            "     Asunto: venta verificarPago(ID_VENTA)\r\n" +
+            "     Ejemplo: venta verificarPago(10)\r\n" +
+            "\r\n" +
+            "PASO 3B: REALIZAR VENTA A CRÉDITO (pagos en cuotas)\r\n" +
+            "  Asunto: venta registrar(3,CREDITO,[1;1],[2;2])\r\n" +
+            "  → Compra 1 prod1 + 2 prod2, dividido en 3 cuotas mensuales\r\n" +
+            "  → Recibirás: Confirmación de venta con detalle de cuotas\r\n" +
+            "\r\n" +
+            "PASO 4: PAGAR UNA CUOTA (si elegiste crédito)\r\n" +
+            "  Primero verifica tus cuotas pendientes:\r\n" +
+            "  Asunto: cuota listarPorCliente()\r\n" +
+            "  → Recibirás lista de cuotas con IDs y estados\r\n" +
+            "  \r\n" +
+            "  Luego genera QR para pagar una cuota específica:\r\n" +
+            "  Asunto: cuota pagar(25)\r\n" +
+            "  → Recibirás: QR de PagoFácil adjunto para esa cuota\r\n" +
+            "  → Escanea el QR y paga\r\n" +
+            "  → Para verificar si se registró el pago:\r\n" +
+            "     Asunto: cuota verificarPago(25)\r\n" +
+            "\r\n" +
+            "NOTAS IMPORTANTES:\r\n" +
+            "• Todos los comandos van en el ASUNTO del correo (cuerpo vacío)\r\n" +
+            "• Los QR generados tienen tiempo límite de pago (ver fecha de expiración)\r\n" +
+            "• Usa verificarPago() para confirmar que tu pago fue registrado\r\n" +
+            "• Si tienes problemas, contacta al soporte técnico";
     }
 
     /**
@@ -340,18 +399,27 @@ public class CommandInterpreter {
             "\r\n" +
             "=== VENTA ===\r\n" +
             "registrar(nro_cuotas,tipo,[producto_id1;cantidad1],...)\r\n" +
-            "  tipo: CONTADO (1 cuota) o CREDITO (>= 2 cuotas)\r\n" +
+            "  tipo: CONTADO (1 cuota, pago inmediato con QR) o CREDITO (>= 2 cuotas)\r\n" +
             "  Nota: cliente_id, estado, interes_mora, fecha y vendedor se asignan automaticamente desde tu correo.\r\n" +
-            "  Ejemplo: venta registrar(1,CONTADO,[1;2],[2;1])\r\n" +
+            "  Ejemplo contado: venta registrar(1,CONTADO,[1;2],[2;1])\r\n" +
+            "                     → Genera venta + QR de PagoFácil adjunto\r\n" +
+            "  Ejemplo crédito: venta registrar(3,CREDITO,[1;1],[2;2])\r\n" +
+            "                     → Genera venta con 3 cuotas mensuales\r\n" +
             "actualizarEstado(id,estado) | eliminar(id)\r\n" +
             "listar() | buscar(id) | listarPorCliente(cliente_id)\r\n" +
+            "verificarPago(id_venta)      <- Verificar estado de pago de una venta\r\n" +
+            "  Ejemplo: venta verificarPago(10)\r\n" +
             "\r\n" +
             "=== CUOTA ===\r\n" +
             "pagar(id,fecha_pago,monto_pagado)   <- pago manual (propietario/vendedor)\r\n" +
-            "pagar(id_cuota)                     <- genera QR para ESA cuota\r\n" +
+            "pagar(id_cuota)                     <- genera QR para ESA cuota específica\r\n" +
+            "  Ejemplo: cuota pagar(25)\r\n" +
+            "             → Recibirás QR adjunto para escanear y pagar\r\n" +
             "eliminar(id) | listarPorVenta(venta_id) | buscar(id)\r\n" +
             "listarPorCliente()      <- tus cuotas (cliente)\r\n" +
             "listarPorCliente(cliente_id)   <- cuotas de otro cliente (staff)\r\n" +
+            "verificarPago(id_cuota)       <- Verificar estado de pago de una cuota\r\n" +
+            "  Ejemplo: cuota verificarPago(25)\r\n" +
             "\r\n" +
             "=== INVENTARIO ===\r\n" +
             "registrar(cantidad,insumo_id,costo_unitario,observacion,tipo_movimiento)\r\n" +
@@ -379,6 +447,120 @@ public class CommandInterpreter {
             "reporte produccion()\r\n" +
             "reporte compras()\r\n" +
             "reporte ingresos()\r\n" +
+            "\r\n" +
+            "═══════════════════════════════════════════════════════════════\r\n" +
+            "FLUJO COMPLETO - Desde registro hasta pago con QR:\r\n" +
+            "═══════════════════════════════════════════════════════════════\r\n" +
+            "\r\n" +
+            "ESCENARIO A: CLIENTE NUEVO QUE QUIERE COMPRAR AL CONTADO\r\n" +
+            "─────────────────────────────────────────────────────────────\r\n" +
+            "\r\n" +
+            "1. REGISTRO DEL CLIENTE\r\n" +
+            "   Asunto: usuario registrar(Maria Garcia,87654321,70012345,Av. Principal #456,maria@gmail.com,pass123,CLIENTE)\r\n" +
+            "   → Sistema responde: \"Usuario registrado exitosamente con ID: 5\"\r\n" +
+            "\r\n" +
+            "2. VER PRODUCTOS DISPONIBLES\r\n" +
+            "   Asunto: producto listar()\r\n" +
+            "   → Sistema responde con lista:\r\n" +
+            "     ID:1 | Nombre:Hamburguesa | Precio:25.00 | Stock:50\r\n" +
+            "     ID:2 | Nombre:Pizza | Precio:45.00 | Stock:30\r\n" +
+            "     ID:3 | Nombre:Refresco | Precio:8.00 | Stock:100\r\n" +
+            "\r\n" +
+            "3. REALIZAR VENTA AL CONTADO\r\n" +
+            "   Asunto: venta registrar(1,CONTADO,[1;2],[3;1])\r\n" +
+            "   → Compra: 2 hamburguesas + 1 refresco = Bs. 58.00\r\n" +
+            "   → Sistema responde:\r\n" +
+            "     \"Venta registrada exitosamente con ID: 10\"\r\n" +
+            "     \"Se ha adjuntado el código QR de PagoFácil para el pago al contado.\"\r\n" +
+            "     \"Transaction ID: 10138936\"\r\n" +
+            "   → Adjunto: Archivo PNG con código QR\r\n" +
+            "\r\n" +
+            "4. PAGAR EL QR\r\n" +
+            "   → Cliente escanea el QR con app bancaria (Tigo Money, Banco Unión, etc.)\r\n" +
+            "   → Confirma el pago de Bs. 58.00\r\n" +
+            "   → PagoFácil procesa el pago automáticamente\r\n" +
+            "\r\n" +
+            "5. VERIFICAR QUE EL PAGO FUE REGISTRADO\r\n" +
+            "   Asunto: venta verificarPago(10)\r\n" +
+            "   → Sistema responde:\r\n" +
+            "     \"=== ESTADO DE PAGO DE VENTA 10 ===\"\r\n" +
+            "     \"Transaction ID: 10138936\"\r\n" +
+            "     \"Estado: Revisión (código: 5)\"\r\n" +
+            "     \"Monto: 58.00 BOB\"\r\n" +
+            "     \"¡PAGO CONFIRMADO!\"\r\n" +
+            "     \"Fecha de pago: 2026-06-19 01:15:30\"\r\n" +
+            "     \"Pagado por: MARIA GARCIA\"\r\n" +
+            "     \"Estado de la venta actualizado a: PAGADO\"\r\n" +
+            "\r\n" +
+            "ESCENARIO B: CLIENTE QUE QUIERE COMPRAR A CRÉDITO\r\n" +
+            "─────────────────────────────────────────────────────────────\r\n" +
+            "\r\n" +
+            "1. CLIENTE YA REGISTRADO (ID: 5)\r\n" +
+            "\r\n" +
+            "2. VER PRODUCTOS\r\n" +
+            "   Asunto: producto listar()\r\n" +
+            "\r\n" +
+            "3. REALIZAR VENTA A CRÉDITO (3 cuotas)\r\n" +
+            "   Asunto: venta registrar(3,CREDITO,[1;1],[2;1])\r\n" +
+            "   → Compra: 1 hamburguesa + 1 pizza = Bs. 70.00\r\n" +
+            "   → Dividido en 3 cuotas de Bs. 23.33 cada una\r\n" +
+            "   → Sistema responde:\r\n" +
+            "     \"Venta registrada exitosamente con ID: 11\"\r\n" +
+            "     \"Cuotas generadas si aplica.\"\r\n" +
+            "     \"Cuota 1: Bs. 23.33 - Vence: 2026-07-19 - Estado: PENDIENTE\"\r\n" +
+            "     \"Cuota 2: Bs. 23.33 - Vence: 2026-08-19 - Estado: PENDIENTE\"\r\n" +
+            "     \"Cuota 3: Bs. 23.34 - Vence: 2026-09-19 - Estado: PENDIENTE\"\r\n" +
+            "\r\n" +
+            "4. VER CUOTAS PENDIENTES\r\n" +
+            "   Asunto: cuota listarPorCliente()\r\n" +
+            "   → Sistema responde:\r\n" +
+            "     \"=== CUOTAS DEL CLIENTE 5 ===\"\r\n" +
+            "     \"N°1 | ID:20 | Vence: 2026-07-19 | Hoy: 2026-06-19\"\r\n" +
+            "     \"  -> Estado: PENDIENTE | Monto a pagar: 23.33\"\r\n" +
+            "     \"N°2 | ID:21 | Vence: 2026-08-19 | Hoy: 2026-06-19\"\r\n" +
+            "     \"  -> Estado: PENDIENTE | Monto a pagar: 23.33\"\r\n" +
+            "     \"N°3 | ID:22 | Vence: 2026-09-19 | Hoy: 2026-06-19\"\r\n" +
+            "     \"  -> Estado: PENDIENTE | Monto a pagar: 23.34\"\r\n" +
+            "\r\n" +
+            "5. PAGAR PRIMERA CUOTA CON QR\r\n" +
+            "   Asunto: cuota pagar(20)\r\n" +
+            "   → Sistema responde:\r\n" +
+            "     \"QR generado para Cuota N°1 (ID 20)\"\r\n" +
+            "     \"Monto: Bs. 23.33\"\r\n" +
+            "     \"Transaction ID: 10138940\"\r\n" +
+            "     \"Escanea el código QR adjunto para pagar.\"\r\n" +
+            "   → Adjunto: Archivo PNG con código QR\r\n" +
+            "\r\n" +
+            "6. PAGAR EL QR\r\n" +
+            "   → Cliente escanea el QR y paga Bs. 23.33\r\n" +
+            "\r\n" +
+            "7. VERIFICAR PAGO DE LA CUOTA\r\n" +
+            "   Asunto: cuota verificarPago(20)\r\n" +
+            "   → Sistema responde:\r\n" +
+            "     \"=== ESTADO DE PAGO DE CUOTA 20 ===\"\r\n" +
+            "     \"Transaction ID: 10138940\"\r\n" +
+            "     \"Estado: Revisión (código: 5)\"\r\n" +
+            "     \"Monto: 23.33 BOB\"\r\n" +
+            "     \"¡PAGO CONFIRMADO!\"\r\n" +
+            "     \"Fecha de pago: 2026-06-19 01:20:15\"\r\n" +
+            "     \"Pagado por: MARIA GARCIA\"\r\n" +
+            "     \"Estado de la cuota actualizado a: PAGADO\"\r\n" +
+            "\r\n" +
+            "8. VER CUOTAS ACTUALIZADAS\r\n" +
+            "   Asunto: cuota listarPorCliente()\r\n" +
+            "   → Sistema muestra:\r\n" +
+            "     \"N°1 | ID:20 | ... | Estado: PAGADO | Monto: 23.33\"\r\n" +
+            "     \"N°2 | ID:21 | ... | Estado: PENDIENTE | Monto a pagar: 23.33\"\r\n" +
+            "     \"N°3 | ID:22 | ... | Estado: PENDIENTE | Monto a pagar: 23.34\"\r\n" +
+            "\r\n" +
+            "NOTAS IMPORTANTES:\r\n" +
+            "• Todos los comandos van en el ASUNTO del correo (dejar cuerpo vacío)\r\n" +
+            "• Los QR tienen fecha de expiración (generalmente 24 horas)\r\n" +
+            "• Usa verificarPago() después de pagar para confirmar que el sistema registró el pago\r\n" +
+            "• Si una cuota vence y no se paga, se genera interés moratorio automático\r\n" +
+            "• Para ventas al contado, el QR se genera automáticamente al crear la venta\r\n" +
+            "• Para ventas a crédito, debes generar QR para cada cuota individualmente\r\n" +
+            "• Transaction ID es el identificador único de PagoFácil para rastrear pagos\r\n" +
             "***************************************************************";
     }
 }

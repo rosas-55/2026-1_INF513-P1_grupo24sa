@@ -5,6 +5,7 @@ import com.tecnoweb.grupo24sa.services.pagofacil.dto.AuthRequest;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.authResponse;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrRequest;
 import com.tecnoweb.grupo24sa.services.pagofacil.dto.QrResponse;
+import com.tecnoweb.grupo24sa.services.pagofacil.dto.QueryTransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.InputStream;
@@ -152,6 +153,41 @@ public class pagoFacilService {
                 return objectMapper.readValue(response.body(), QrResponse.class);
             } else {
                 System.err.println("Error al generar QR PagoFacil: HTTP " + response.statusCode());
+                System.err.println("Body: " + response.body());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Consulta el estado de una transacción en PagoFácil.
+     * @param pagofacilTransactionId ID de transacción de PagoFácil
+     * @return QueryTransactionResponse con el estado del pago, o null si hay error
+     */
+    public QueryTransactionResponse consultarTransaccion(long pagofacilTransactionId) {
+        if (this.accessToken == null || this.accessToken.isEmpty()) {
+            throw new IllegalStateException("El servicio no ha sido autenticado. Llame a autenticar() primero.");
+        }
+
+        try {
+            String jsonPayload = "{\"pagofacilTransactionId\": " + pagofacilTransactionId + "}";
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + "/query-transaction"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + this.accessToken)
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                return objectMapper.readValue(response.body(), QueryTransactionResponse.class);
+            } else {
+                System.err.println("Error al consultar transacción PagoFacil: HTTP " + response.statusCode());
                 System.err.println("Body: " + response.body());
             }
         } catch (Exception e) {

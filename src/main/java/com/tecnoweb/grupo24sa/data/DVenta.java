@@ -78,6 +78,27 @@ public class DVenta {
     }
 
     /**
+     * Actualizar el pagofacilTransactionId de una venta
+     */
+    public String updatePagoFacilTransactionId(int id, long pagofacilTransactionId) {
+        String query = "UPDATE VENTA SET pagofacil_transaction_id = ? WHERE id = ?";
+        try {
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setLong(1, pagofacilTransactionId);
+            ps.setInt(2, id);
+
+            int result = ps.executeUpdate();
+            ps.close();
+
+            return result > 0 ? "Venta actualizada con transaction ID de PagoFácil" : "Error: No se pudo actualizar la venta";
+        } catch (SQLException e) {
+            return "Error de BD: " + e.getMessage();
+        }
+    }
+
+    /**
      * Actualizar estado de una venta
      */
     public String updateEstado(int id, String estado) {
@@ -122,7 +143,7 @@ public class DVenta {
      * Listar todas las ventas
      */
     public List<String[]> findAll() {
-        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id FROM VENTA ORDER BY fecha DESC";
+        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofacil_transaction_id FROM VENTA ORDER BY fecha DESC";
         List<String[]> ventas = new ArrayList<>();
         try {
             java.sql.Connection conn = databaseConection.openConnection();
@@ -131,7 +152,7 @@ public class DVenta {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] venta = new String[9];
+                String[] venta = new String[10];
                 venta[0] = String.valueOf(rs.getInt("id"));
                 venta[1] = String.valueOf(rs.getInt("cliente_id"));
                 venta[2] = rs.getString("estado");
@@ -141,6 +162,7 @@ public class DVenta {
                 venta[6] = rs.getString("tipo");
                 venta[7] = String.valueOf(rs.getDouble("total"));
                 venta[8] = String.valueOf(rs.getInt("vendedor_id"));
+                venta[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
                 ventas.add(venta);
             }
 
@@ -158,7 +180,7 @@ public class DVenta {
      * Buscar venta por ID
      */
     public String[] findOneById(int id) {
-        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id FROM VENTA WHERE id = ?";
+        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofacil_transaction_id FROM VENTA WHERE id = ?";
         try {
             java.sql.Connection conn = databaseConection.openConnection();
             if (conn == null) return null;
@@ -167,7 +189,7 @@ public class DVenta {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                String[] venta = new String[9];
+                String[] venta = new String[10];
                 venta[0] = String.valueOf(rs.getInt("id"));
                 venta[1] = String.valueOf(rs.getInt("cliente_id"));
                 venta[2] = rs.getString("estado");
@@ -177,6 +199,7 @@ public class DVenta {
                 venta[6] = rs.getString("tipo");
                 venta[7] = String.valueOf(rs.getDouble("total"));
                 venta[8] = String.valueOf(rs.getInt("vendedor_id"));
+                venta[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
 
                 rs.close();
                 ps.close();
@@ -196,7 +219,7 @@ public class DVenta {
      * Listar ventas por cliente
      */
     public List<String[]> findByCliente(int clienteId) {
-        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id FROM VENTA WHERE cliente_id = ? ORDER BY fecha DESC";
+        String query = "SELECT id, cliente_id, estado, fecha, interes_mora, nro_cuotas, tipo, total, vendedor_id, pagofacil_transaction_id FROM VENTA WHERE cliente_id = ? ORDER BY fecha DESC";
         List<String[]> ventas = new ArrayList<>();
         try {
             java.sql.Connection conn = databaseConection.openConnection();
@@ -206,7 +229,7 @@ public class DVenta {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] venta = new String[9];
+                String[] venta = new String[10];
                 venta[0] = String.valueOf(rs.getInt("id"));
                 venta[1] = String.valueOf(rs.getInt("cliente_id"));
                 venta[2] = rs.getString("estado");
@@ -216,6 +239,7 @@ public class DVenta {
                 venta[6] = rs.getString("tipo");
                 venta[7] = String.valueOf(rs.getDouble("total"));
                 venta[8] = String.valueOf(rs.getInt("vendedor_id"));
+                venta[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
                 ventas.add(venta);
             }
 

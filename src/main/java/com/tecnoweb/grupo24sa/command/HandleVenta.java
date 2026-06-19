@@ -37,6 +37,7 @@ public class HandleVenta {
                 case "listar":           return new ReporteResponse(listar(bVenta));
                 case "buscar":           return new ReporteResponse(buscar(bVenta, params));
                 case "listarPorCliente": return new ReporteResponse(listarPorCliente(bVenta, params));
+                case "verificarPago":    return new ReporteResponse(verificarPago(bVenta, params));
                 default:                 return new ReporteResponse("Comando no implementado: " + command);
             }
         } catch (NumberFormatException e) {
@@ -119,6 +120,10 @@ public class HandleVenta {
 
                     QrResponse qrRes = pfService.generarQR(req);
                     if (qrRes != null && qrRes.getError() == 0 && qrRes.getValues() != null) {
+                        // Guardar el transactionId de PagoFácil en la venta
+                        long transactionId = qrRes.getValues().getTransactionId();
+                        b.actualizarPagoFacilTransactionId(ventaId, transactionId);
+
                         String base64Data = qrRes.getValues().getQrBase64();
                         if (base64Data.startsWith("data:image/png;base64,")) {
                             base64Data = base64Data.substring(22);
@@ -129,7 +134,7 @@ public class HandleVenta {
                             fos.write(imageBytes);
                         }
                         response.addArchivoAdjunto(qrFile);
-                        response.setTextoRespuesta(resDb + "\n\nSe ha adjuntado el código QR de PagoFácil para el pago al contado.");
+                        response.setTextoRespuesta(resDb + "\n\nSe ha adjuntado el código QR de PagoFácil para el pago al contado.\nTransaction ID: " + transactionId);
                     } else {
                         // FALLO EN GENERAR QR - ROLLBACK
                         if (ventaId != -1) b.eliminarVenta(ventaId);
@@ -207,5 +212,10 @@ public class HandleVenta {
               .append("\n");
         }
         return sb.toString();
+    }
+
+    /** verificarPago(id_venta) */
+    private static String verificarPago(BVenta b, String params) {
+        return b.verificarPago(Integer.parseInt(params.trim()));
     }
 }

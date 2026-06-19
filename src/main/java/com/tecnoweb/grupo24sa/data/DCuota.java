@@ -94,6 +94,27 @@ public class DCuota {
     }
 
     /**
+     * Actualizar el pagofacilTransactionId de una cuota
+     */
+    public String updatePagoFacilTransactionId(int id, long pagofacilTransactionId) {
+        String query = "UPDATE CUOTA SET pagofacil_transaction_id = ? WHERE id = ?";
+        try {
+            java.sql.Connection conn = databaseConection.openConnection();
+            if (conn == null) return "Error: No se pudo obtener la conexion a la base de datos";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setLong(1, pagofacilTransactionId);
+            ps.setInt(2, id);
+
+            int result = ps.executeUpdate();
+            ps.close();
+
+            return result > 0 ? "Cuota actualizada con transaction ID de PagoFácil" : "Error: No se pudo actualizar la cuota";
+        } catch (SQLException e) {
+            return "Error de BD: " + e.getMessage();
+        }
+    }
+
+    /**
      * Eliminar cuota por ID
      */
     public String delete(int id) {
@@ -117,7 +138,7 @@ public class DCuota {
      * Listar cuotas por venta
      */
     public List<String[]> findByVenta(int ventaId) {
-        String query = "SELECT id, estado, fecha_pago, fecha_vencimiento, interes_mora, monto_pagado, nro_cuota, plan_pago, venta_id " +
+        String query = "SELECT id, estado, fecha_pago, fecha_vencimiento, interes_mora, monto_pagado, nro_cuota, plan_pago, venta_id, pagofacil_transaction_id " +
                 "FROM CUOTA WHERE venta_id = ? ORDER BY nro_cuota";
         List<String[]> cuotas = new ArrayList<>();
         try {
@@ -128,7 +149,7 @@ public class DCuota {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] cuota = new String[9];
+                String[] cuota = new String[10];
                 cuota[0] = String.valueOf(rs.getInt("id"));
                 cuota[1] = rs.getString("estado");
                 cuota[2] = rs.getString("fecha_pago");
@@ -138,6 +159,7 @@ public class DCuota {
                 cuota[6] = String.valueOf(rs.getInt("nro_cuota"));
                 cuota[7] = rs.getString("plan_pago");
                 cuota[8] = String.valueOf(rs.getInt("venta_id"));
+                cuota[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
                 cuotas.add(cuota);
             }
 
@@ -155,7 +177,7 @@ public class DCuota {
      * Listar cuotas por cliente
      */
     public List<String[]> findByCliente(int clienteId) {
-        String query = "SELECT c.id, c.estado, c.fecha_pago, c.fecha_vencimiento, c.interes_mora, c.monto_pagado, c.nro_cuota, c.plan_pago, c.venta_id " +
+        String query = "SELECT c.id, c.estado, c.fecha_pago, c.fecha_vencimiento, c.interes_mora, c.monto_pagado, c.nro_cuota, c.plan_pago, c.venta_id, c.pagofacil_transaction_id " +
                 "FROM CUOTA c INNER JOIN VENTA v ON c.venta_id = v.id WHERE v.cliente_id = ? ORDER BY c.fecha_vencimiento ASC";
         List<String[]> cuotas = new ArrayList<>();
         try {
@@ -166,7 +188,7 @@ public class DCuota {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] cuota = new String[9];
+                String[] cuota = new String[10];
                 cuota[0] = String.valueOf(rs.getInt("id"));
                 cuota[1] = rs.getString("estado");
                 cuota[2] = rs.getString("fecha_pago");
@@ -176,6 +198,7 @@ public class DCuota {
                 cuota[6] = String.valueOf(rs.getInt("nro_cuota"));
                 cuota[7] = rs.getString("plan_pago");
                 cuota[8] = String.valueOf(rs.getInt("venta_id"));
+                cuota[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
                 cuotas.add(cuota);
             }
 
@@ -192,7 +215,7 @@ public class DCuota {
      * Buscar cuota por ID
      */
     public String[] findOneById(int id) {
-        String query = "SELECT id, estado, fecha_pago, fecha_vencimiento, interes_mora, monto_pagado, nro_cuota, plan_pago, venta_id " +
+        String query = "SELECT id, estado, fecha_pago, fecha_vencimiento, interes_mora, monto_pagado, nro_cuota, plan_pago, venta_id, pagofacil_transaction_id " +
                 "FROM CUOTA WHERE id = ?";
         try {
             java.sql.Connection conn = databaseConection.openConnection();
@@ -202,7 +225,7 @@ public class DCuota {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                String[] cuota = new String[9];
+                String[] cuota = new String[10];
                 cuota[0] = String.valueOf(rs.getInt("id"));
                 cuota[1] = rs.getString("estado");
                 cuota[2] = rs.getString("fecha_pago");
@@ -212,6 +235,7 @@ public class DCuota {
                 cuota[6] = String.valueOf(rs.getInt("nro_cuota"));
                 cuota[7] = rs.getString("plan_pago");
                 cuota[8] = String.valueOf(rs.getInt("venta_id"));
+                cuota[9] = rs.getObject("pagofacil_transaction_id") != null ? String.valueOf(rs.getLong("pagofacil_transaction_id")) : null;
 
                 rs.close();
                 ps.close();

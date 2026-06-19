@@ -167,4 +167,98 @@ public class BCuota {
             return "Error: No se pudo calcular la mora: " + e.getMessage();
         }
     }
+
+    /**
+     * Actualiza el pagofacilTransactionId de una cuota
+     */
+    public String actualizarPagoFacilTransactionId(int id, long pagofacilTransactionId) {
+        if (dCuota.findOneById(id) == null) {
+            return "Error: Cuota no encontrada con ID: " + id;
+        }
+        return dCuota.updatePagoFacilTransactionId(id, pagofacilTransactionId);
+    }
+
+    /**
+     * Verifica el estado de pago de una cuota mediante PagoFácil
+     * @param id ID de la cuota
+     * @return Mensaje con el resultado de la verificación
+     */
+    public String verificarPago(int id) {
+        String[] cuota = dCuota.findOneById(id);
+        if (cuota == null) {
+            return "Error: Cuota no encontrada con ID: " + id;
+        }
+
+        // Obtener el pagofacilTransactionId (índice 9)
+        String transactionIdStr = cuota.length > 9 ? cuota[9] : null;
+        if (transactionIdStr == null || transactionIdStr.trim().isEmpty()) {
+            return "Error: La cuota no tiene un transaction ID de PagoFácil asociado";
+        }
+
+        long pagofacilTransactionId;
+        try {
+            pagofacilTransactionId = Long.parseLong(transactionIdStr.trim());
+        } catch (NumberFormatException e) {
+            return "Error: El transaction ID de PagoFácil es inválido: " + transactionIdStr;
+        }
+
+        // Consultar a PagoFácil
+        com.tecnoweb.grupo24sa.services.pagofacil.pagoFacilService pfService = 
+            new com.tecnoweb.grupo24sa.services.pagofacil.pagoFacilService();
+        
+        if (!pfService.autenticar()) {
+            return "Error: Falló la autenticación con PagoFácil";
+        }
+
+        com.tecnoweb.grupo24sa.services.pagofacil.dto.QueryTransactionResponse response = 
+            pfService.consultarTransaccion(pagofacilTransactionId);
+        
+        if (response == null) {
+            return "Error: No se pudo consultar la transacción en PagoFácil";
+        }
+
+        if (response.getError() != 0) {
+            return "Error en PagoFácil: " + response.getMessage();
+        }
+
+        com.tecnoweb.grupo24sa.services.pagofacil.dto.QueryTransactionResponse.Values values = response.getValues();
+        if (values == null) {
+            return "Error: Respuesta inválida de PagoFácil";
+        }
+
+        int paymentStatus = values.getPaymentStatus();
+        String statusDesc = values.getPaymentStatusDescription();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ESTADO DE PAGO DE CUOTA ").append(id).append(" ===\n");
+        sb.append("Transaction ID: ").append(values.getPagofacilTransactionId()).append("\n");
+        sb.append("Estado: ").append(statusDesc).append(" (código: ").append(paymentStatus).append(")\n");
+        sb.append("Monto: ").append(values.getAmount()).append(" ").append(values.getCurrencyCode()).append("\n");
+
+        // paymentStatus 5 = Pagado/Revisión (según documentación)
+        if (paymentStatus == 5) {
+            sb.append("\n¡PAGO CONFIRMADO!\n");
+            if (values.getPaymentDate() != null) {
+                sb.append("Fecha de pago: ").append(values.getPaymentDate()).append(" ").append(values.getPaymentTime()).append("\n");
+            }
+            if (values.getPayerName() != null) {
+                sb.append("Pagado por: ").append(values.getPayerName()).append("\n");
+            }
+            
+            // Actualizar estado de la cuota a PAGADO si está pendiente o en mora
+            String estadoActual = cuota[1];
+            if (estadoActual.equalsIgnoreCase("PENDIENTE") || estadoActual.equalsIgnoreCase("EN_MORA")) {
+                String fechaPago = values.getPaymentDate() != null ? values.getPaymentDate() : java.time.LocalDate.now().toString();
+                double montoPagado = Double.parseDouble(cuota[5]);
+                dCuota.update(id, "PAGADO", fechaPago, montoPagado);
+                sb.append("\nEstado de la cuota actualizado a: PAGADO");
+            }
+        } else if (paymentStatus == 1) {
+            sb.append("\nEl pago está EN PROCESO. Por favor espere la confirmación.");
+        } else {
+            sb.append("\nEl pago aún no ha sido completado. Estado actual: ").append(statusDesc);
+        }
+
+        return sb.toString();
+    }
 }
